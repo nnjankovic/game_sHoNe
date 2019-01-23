@@ -184,6 +184,7 @@ bool D3dApp::InitDirect3D() {
 	);
 	assert(multisampleQuality.NumQualityLevels > 0);
 
+	CreateCommandObjects();
 
 
 }
@@ -196,6 +197,16 @@ void D3dApp::CreateCommandObjects() {
 	HRESULT hr = m_d3dDevice->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&m_d3dCommandQueue));
 	assert(!FAILED(hr));
 
+	hr = m_d3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(m_d3dCommandAllocator.GetAddressOf()));
+	assert(!FAILED(hr));
 
-
+	hr = m_d3dDevice->CreateCommandList(
+		0,
+		D3D12_COMMAND_LIST_TYPE_DIRECT,
+		m_d3dCommandAllocator.Get(),
+		nullptr,
+		IID_PPV_ARGS(&m_d3dCommandList)
+		);
+	assert(!FAILED(hr));
+	m_d3dCommandList->Close();
 }
