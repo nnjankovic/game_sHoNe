@@ -14,7 +14,7 @@ int main()
 
 	timer.Tick();
 
-	cout << timer.deltaTimeSeconds() << endl;
+	cout << timer.DeltaTime() << endl;
 
 	return 1;
 }
