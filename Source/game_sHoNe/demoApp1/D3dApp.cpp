@@ -1,4 +1,9 @@
 #include "D3dApp.h"
+#include <WindowsX.h>
+
+using Microsoft::WRL::ComPtr;
+using namespace std;
+using namespace DirectX;
 
 D3dApp* D3dApp::s_instance = nullptr;
 
@@ -157,6 +162,11 @@ LRESULT  D3dApp::MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 bool D3dApp::InitDirect3D() {
 
 	HRESULT hr;
+
+	hr = CreateDXGIFactory1(IID_PPV_ARGS(&m_dxgiFactory));
+	if (FAILED(hr))
+		return false;
+
 	hr = D3D12CreateDevice(nullptr,	//display adapter if nullptr use primary 
 						   D3D_FEATURE_LEVEL_11_0, //minimum feature level
 						   IID_PPV_ARGS(&m_d3dDevice)); // macro that holds COM ID of parameter and parameter
@@ -182,11 +192,12 @@ bool D3dApp::InitDirect3D() {
 		&multisampleQuality,
 		sizeof(&multisampleQuality)
 	);
+	m_4xMsaaQuality = multisampleQuality.NumQualityLevels;
 	assert(multisampleQuality.NumQualityLevels > 0);
 
 	CreateCommandObjects();
-
-
+	CreateSwapChain();
+	CreateDescriptorHeaps();
 }
 
 void D3dApp::CreateCommandObjects() {
@@ -209,4 +220,67 @@ void D3dApp::CreateCommandObjects() {
 		);
 	assert(!FAILED(hr));
 	m_d3dCommandList->Close();
+}
+
+void D3dApp::CreateSwapChain() {
+
+	m_d3dSwapChain.Reset();
+
+	DXGI_SWAP_CHAIN_DESC swapChainDesc;
+	
+	swapChainDesc.BufferDesc.Height = m_screenHeight;
+	swapChainDesc.BufferDesc.Width = m_screenWidth;
+	swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
+	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+	swapChainDesc.BufferDesc.Format = m_backBufferFormat;
+	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	swapChainDesc.BufferCount = D3dApp::s_backBufferCount;
+	swapChainDesc.SampleDesc.Count = m_4xMsaaState ? 4 : 1;
+	swapChainDesc.SampleDesc.Quality = m_4xMsaaState ? (m_4xMsaaQuality - 1) : 0;
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	swapChainDesc.OutputWindow = m_window;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	swapChainDesc.Windowed = true;
+
+	HRESULT hr = m_dxgiFactory->CreateSwapChain(
+		m_d3dCommandQueue.Get(),
+		&swapChainDesc,
+		m_d3dSwapChain.GetAddressOf()
+	);
+	assert(!FAILED(hr));
+
+}
+
+void D3dApp::CreateDescriptorHeaps() {
+	HRESULT hr;
+	
+	D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
+	rtvHeapDesc.NumDescriptors = s_backBufferCount;
+	rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	rtvHeapDesc.NodeMask = 0;
+	rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	hr = m_d3dDevice->CreateDescriptorHeap(
+		&rtvHeapDesc,
+		IID_PPV_ARGS(&m_d3dRTVDescriptorHeap)
+	);
+	assert(!FAILED(hr));
+
+	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
+	dsvHeapDesc.NumDescriptors = 1;
+	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+	dsvHeapDesc.NodeMask = 0;
+	dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	hr = m_d3dDevice->CreateDescriptorHeap(
+		&dsvHeapDesc,
+		IID_PPV_ARGS(&m_d3dDSVDescriptorHeap)
+	);
+	assert(!FAILED(hr));
+}
+
+void D3dApp::CreateRTV() {
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandle(m_d3dRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
 }
