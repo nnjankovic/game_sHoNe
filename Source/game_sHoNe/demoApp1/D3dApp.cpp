@@ -279,8 +279,101 @@ void D3dApp::CreateDescriptorHeaps() {
 	assert(!FAILED(hr));
 }
 
-void D3dApp::CreateRTV() {
+void D3dApp::CreateRTViewAndBuffer() {
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandle(m_d3dRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	for (int i = 0; i < s_backBufferCount; i++)
+	{
+		HRESULT hr = m_d3dSwapChain->GetBuffer(i, IID_PPV_ARGS(&m_d3dSwapChainBuffers[i]));
+		assert(!FAILED(hr));
+		m_d3dDevice->CreateRenderTargetView(m_d3dSwapChainBuffers[i].Get(), nullptr, rtvHeapHandle);
+		rtvHeapHandle.Offset(1, m_RtvDescriptorSize);
+	}
+}
 
+void D3dApp::CreateDSViewAndBuffer() {
+
+	D3D12_RESOURCE_DESC depthStencilDesc;
+
+	depthStencilDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	depthStencilDesc.Alignment = 0;
+	depthStencilDesc.Width = m_screenWidth;
+	depthStencilDesc.Height = m_screenHeight;
+	depthStencilDesc.DepthOrArraySize = 1;
+	depthStencilDesc.MipLevels = 1;
+	depthStencilDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+	depthStencilDesc.SampleDesc.Count = m_4xMsaaState ? 4 : 1;
+	depthStencilDesc.SampleDesc.Quality = m_4xMsaaState ? (m_4xMsaaQuality - 1) : 0;
+	depthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	depthStencilDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+	D3D12_CLEAR_VALUE optClear;
+	optClear.Format = m_depthStencilFormat;
+	optClear.DepthStencil.Depth = 1.0f;
+	optClear.DepthStencil.Stencil = 0;
+	HRESULT hr = m_d3dDevice->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		D3D12_HEAP_FLAG_NONE,
+		&depthStencilDesc,
+		D3D12_RESOURCE_STATE_COMMON,
+		&optClear,
+		IID_PPV_ARGS(m_d3dDepthStencilBuffer.GetAddressOf()));
+	assert(!FAILED(hr));
+}
+
+void D3dApp::FlushCommandQueue() {
+
+	m_currentFenceValue++;
+
+	HRESULT hr = m_d3dCommandQueue->Signal(m_d3dFence.Get(), m_currentFenceValue);
+	assert(!FAILED(hr));
+
+	if (m_d3dFence->GetCompletedValue() < m_currentFenceValue)
+	{
+		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+		m_d3dFence->SetEventOnCompletion(m_currentFenceValue, eventHandle);
+		WaitForSingleObject(eventHandle, INFINITE);
+		CloseHandle(eventHandle);
+	}
+}
+
+void D3dApp::OnResize() {
+	assert(m_d3dDevice);
+	assert(m_d3dSwapChain);
+	assert(m_d3dCommandAllocator);
+
+	FlushCommandQueue();
+
+	HRESULT hr = m_d3dCommandList->Reset(m_d3dCommandAllocator.Get(), nullptr);
+	assert(!FAILED(hr));
+
+	for (int i = 0; i < s_backBufferCount; i++)
+	{
+		m_d3dSwapChainBuffers[i].Reset();
+	}
+	m_d3dDepthStencilBuffer.Reset();
+
+	hr = m_d3dSwapChain->ResizeBuffers(
+		s_backBufferCount,
+		m_screenWidth, m_screenHeight,
+		m_backBufferFormat,
+		DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
+	);
+	assert(!FAILED(hr));
+
+	m_currentBackBuffer = 0;
+
+	CreateRTViewAndBuffer();
+	CreateDSViewAndBuffer();
+
+	m_d3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_d3dDepthStencilBuffer.Get(),
+		D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+
+	hr = m_d3dCommandList->Close();
+	assert(!FAILED(hr));
+
+	ID3D12CommandList* cmdsLists[] = { m_d3dCommandList.Get() };
+	m_d3dCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+
+	FlushCommandQueue();
 }

@@ -32,9 +32,17 @@ protected:
 	bool InitDirect3D();
 	void CreateCommandObjects();
 	void CreateSwapChain();
+
+	//Should be virtual
 	void CreateDescriptorHeaps();
+	void OnResize();
 	
-	void CreateRTV();
+	void CreateRTViewAndBuffer();
+	void CreateDSViewAndBuffer();
+
+	void FlushCommandQueue();
+
+	
 
 	Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
 
@@ -54,6 +62,7 @@ protected:
 	unsigned int m_CrvSrvUrvDescriptorSize; // constant buffers, shader resources, unordered access view resources
 
 	DXGI_FORMAT m_backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	DXGI_FORMAT m_depthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	static const int s_backBufferCount = 2;
 	int m_currentBackBuffer = 0;
