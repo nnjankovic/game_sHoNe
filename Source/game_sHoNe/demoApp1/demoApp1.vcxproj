@@ -143,11 +143,13 @@
   <ItemGroup>
     <ClInclude Include="D3dApp.h" />
     <ClInclude Include="GameTimer.h" />
+    <ClInclude Include="InitD3D.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3dApp.cpp" />
     <ClCompile Include="GameTimer.cpp" />
+    <ClCompile Include="InitD3D.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -15,8 +15,7 @@ protected:
 	D3dApp(HINSTANCE hInstance);
 	D3dApp(const D3dApp& rhs) = delete;
 	D3dApp& operator= (const D3dApp& rhs) = delete;
-	virtual ~D3dApp() {};
-
+	virtual ~D3dApp();
 public:
 	static D3dApp* getInstance() { return s_instance; }
 	
@@ -27,22 +26,24 @@ public:
 	virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void Run();
 
+	virtual bool Initialize();
+
 protected:
 	bool InitMainWindow();
 	bool InitDirect3D();
 	void CreateCommandObjects();
 	void CreateSwapChain();
+	void CalculateFrameStats();
 
-	//Should be virtual
-	void CreateDescriptorHeaps();
-	void OnResize();
+	virtual void CreateDescriptorHeaps();
+	virtual void OnResize();
+	virtual void Update(const GameTimer& gt) = 0;
+	virtual void Draw(const GameTimer& gt) = 0;
 	
 	void CreateRTViewAndBuffer();
 	void CreateDSViewAndBuffer();
 
 	void FlushCommandQueue();
-
-	
 
 	Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
 
@@ -74,14 +75,22 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_d3dRTVDescriptorHeap;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_d3dDSVDescriptorHeap;
 
+	D3D12_VIEWPORT m_viewPort;
+	D3D12_RECT m_scissorRect;
+
 private:
 	HWND m_window;
 	HINSTANCE m_hInstance;
 	const std::wstring m_windowClassName = L"D3DAppMainWindow";
+	std::wstring m_mainWndCaption = L"d3d App";
 
 	int m_screenWidth;
 	int m_screenHeight;
-	bool m_isAppPaused;
+
+	bool m_isAppPaused = false;
+	bool m_isMaximized = false;
+	bool m_isMinimized = false;
+	bool m_isResizing = false;
 
 	GameTimer m_timer;
 };

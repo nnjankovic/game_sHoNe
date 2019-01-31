@@ -10,7 +10,7 @@ D3dApp* D3dApp::s_instance = nullptr;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 
-	return 0;
+	return D3dApp::getInstance()->MsgProc(hWnd, message, wParam, lParam);
 }
 
 D3dApp::D3dApp(HINSTANCE hInstance) : m_hInstance(hInstance),
@@ -20,6 +20,11 @@ D3dApp::D3dApp(HINSTANCE hInstance) : m_hInstance(hInstance),
 									  m_currentFenceValue(0)
 {
 	s_instance = this;
+}
+
+D3dApp::~D3dApp() {
+	if (m_d3dDevice)
+		FlushCommandQueue();
 }
 
 bool D3dApp::InitMainWindow() {
@@ -78,11 +83,13 @@ void D3dApp::Run() {
 			m_timer.Tick();
 			if (!m_isAppPaused)
 			{
-
+				CalculateFrameStats();
+				Update(m_timer);
+				Draw(m_timer);
 			}
 			else
 			{
-
+				Sleep(100);
 			}
 		}
 	}
@@ -109,12 +116,61 @@ LRESULT  D3dApp::MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
 		case WM_SIZE:
 
+			m_screenWidth = LOWORD(lParam);
+			m_screenHeight = HIWORD(lParam);
+			if (m_d3dDevice)
+			{
+				if (wParam == SIZE_MINIMIZED)
+				{
+					m_isAppPaused = true;
+					m_isMinimized = true;
+					m_isMaximized = false;
+				}
+				else if (wParam == SIZE_MAXIMIZED)
+				{
+					m_isAppPaused = false;
+					m_isMinimized = false;
+					m_isMaximized = true;
+					OnResize();
+				}
+				else if (wParam == SIZE_RESTORED)
+				{
+					if (m_isMinimized)
+					{
+						m_isAppPaused = false;
+						m_isMinimized = false;
+						OnResize();
+					}
+					else if (m_isMaximized)
+					{
+						m_isAppPaused = false;
+						m_isMaximized = false;
+						OnResize();
+					}
+					else if (m_isResizing)
+					{
+
+					}
+					else
+					{
+						OnResize();
+					}
+				}
+			}
+
 			break;
 
 		case WM_ENTERSIZEMOVE:
+			m_isAppPaused = true;
+			m_isResizing = true;
+			m_timer.Pause();
 			break;
 
 		case WM_EXITSIZEMOVE:
+			m_isAppPaused = false;
+			m_isResizing = false;
+			m_timer.UnPause();
+			OnResize();
 			break;
 
 		case WM_DESTROY:
@@ -125,6 +181,8 @@ LRESULT  D3dApp::MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 			return MAKELRESULT(0, MNC_CLOSE);
 
 		case WM_GETMINMAXINFO:
+			((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
+			((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
 			break;
 
 		case WM_LBUTTONDOWN:
@@ -376,4 +434,59 @@ void D3dApp::OnResize() {
 	m_d3dCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
 	FlushCommandQueue();
+
+	m_viewPort.TopLeftX = 0;
+	m_viewPort.TopLeftY = 0;
+	m_viewPort.Width = static_cast<float>(m_screenWidth);
+	m_viewPort.Height = static_cast<float>(m_screenHeight);
+	m_viewPort.MinDepth = 0.0f;
+	m_viewPort.MaxDepth = 1.0f;
+
+	m_scissorRect = { 0, 0, m_screenWidth, m_screenHeight };
+}
+
+bool D3dApp::Initialize() {
+
+	if (!InitMainWindow())
+		return false;
+
+	if (!InitDirect3D())
+		return false;
+
+	OnResize();
+
+	return true;
+
+}
+
+void D3dApp::CalculateFrameStats()
+{
+	// Code computes the average frames per second, and also the 
+	// average time it takes to render one frame.  These stats 
+	// are appended to the window caption bar.
+
+	static int frameCnt = 0;
+	static float timeElapsed = 0.0f;
+
+	frameCnt++;
+
+	// Compute averages over one second period.
+	if ((m_timer.GameTime() - timeElapsed) >= 1.0f)
+	{
+		float fps = (float)frameCnt; // fps = frameCnt / 1
+		float mspf = 1000.0f / fps;
+
+		wstring fpsStr = to_wstring(fps);
+		wstring mspfStr = to_wstring(mspf);
+
+		wstring windowText = m_mainWndCaption +
+			L"    fps: " + fpsStr +
+			L"   mspf: " + mspfStr;
+
+		SetWindowText(m_window, windowText.c_str());
+
+		// Reset for next average.
+		frameCnt = 0;
+		timeElapsed += 1.0f;
+	}
 }
