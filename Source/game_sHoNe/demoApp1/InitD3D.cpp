@@ -28,10 +28,10 @@ void InitD3D::Update(const GameTimer& gt) {
 void InitD3D::Draw(const GameTimer& gt) {
 	
 	HRESULT hr = m_d3dCommandAllocator->Reset();
-	assert(!FAILED(hr));
+	assert(!(FAILED(hr)));
 
 	hr = m_d3dCommandList->Reset(m_d3dCommandAllocator.Get(), nullptr);
-	assert(!FAILED(hr));
+	assert(!(FAILED(hr)));
 
 	m_d3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_d3dSwapChainBuffers[m_currentBackBuffer].Get(),
 																				D3D12_RESOURCE_STATE_PRESENT, //state before

@@ -1,6 +1,5 @@
 ﻿  D3dApp.cpp
-c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\demoapp1\d3dapp.h(28): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
-c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\demoapp1\d3dapp.cpp(74): warning C4700: uninitialized local variable 'msg' used
+c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\demoapp1\d3dapp.h(24): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
 c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\demoapp1\d3dapp.cpp(259): warning C4715: 'D3dApp::InitDirect3D': not all control paths return a value
   demoApp1.vcxproj -> C:\Users\nenad.n.jankovic\Documents\GitHub\game_sHoNe\Source\game_sHoNe\x64\Debug\demoApp1.exe
   demoApp1.vcxproj -> C:\Users\nenad.n.jankovic\Documents\GitHub\game_sHoNe\Source\game_sHoNe\x64\Debug\demoApp1.pdb (Partial PDB)

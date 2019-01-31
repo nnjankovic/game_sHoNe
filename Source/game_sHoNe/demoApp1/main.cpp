@@ -2,19 +2,19 @@
 #include<thread>
 #include<chrono>
 #include<iostream>
+
+#include "InitD3D.h"
+
 using namespace std;
 
-int main()
+int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR    lpCmdLine, int nCmdShow)
 {
-	GameTimer timer;
 
-	timer.Tick();
+	InitD3D app(hInstance);
 
-	this_thread::sleep_for(std::chrono::seconds(2));
+	app.Initialize();
 
-	timer.Tick();
-
-	cout << timer.DeltaTime() << endl;
+	app.Run();
 
 	return 1;
 }

@@ -55,7 +55,7 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_d3dCommandAllocator;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> m_d3dCommandList;
 
-	bool      m_4xMsaaState = true;
+	bool      m_4xMsaaState = false;
 	unsigned int m_4xMsaaQuality = 0;
 
 	unsigned int m_RtvDescriptorSize; // render target view descriptor size

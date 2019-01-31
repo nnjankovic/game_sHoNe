@@ -67,7 +67,7 @@ bool D3dApp::InitMainWindow() {
 }
 
 void D3dApp::Run() {
-	MSG msg;
+	MSG msg = {0};
 
 	m_timer.Reset();
 
@@ -248,10 +248,10 @@ bool D3dApp::InitDirect3D() {
 	m_d3dDevice->CheckFeatureSupport(
 		D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS,
 		&multisampleQuality,
-		sizeof(&multisampleQuality)
+		sizeof(multisampleQuality)
 	);
 	m_4xMsaaQuality = multisampleQuality.NumQualityLevels;
-	assert(multisampleQuality.NumQualityLevels > 0);
+	assert(m_4xMsaaQuality > 0);
 
 	CreateCommandObjects();
 	CreateSwapChain();
@@ -259,15 +259,15 @@ bool D3dApp::InitDirect3D() {
 }
 
 void D3dApp::CreateCommandObjects() {
-	D3D12_COMMAND_QUEUE_DESC commandQueueDesc;
+	D3D12_COMMAND_QUEUE_DESC commandQueueDesc = {};
 	commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 	commandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	
 	HRESULT hr = m_d3dDevice->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&m_d3dCommandQueue));
-	assert(!FAILED(hr));
+	assert(!(FAILED(hr)));
 
 	hr = m_d3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(m_d3dCommandAllocator.GetAddressOf()));
-	assert(!FAILED(hr));
+	assert(!(FAILED(hr)));
 
 	hr = m_d3dDevice->CreateCommandList(
 		0,
@@ -276,7 +276,7 @@ void D3dApp::CreateCommandObjects() {
 		nullptr,
 		IID_PPV_ARGS(&m_d3dCommandList)
 		);
-	assert(!FAILED(hr));
+	assert(!(FAILED(hr)));
 	m_d3dCommandList->Close();
 }
 
@@ -307,7 +307,7 @@ void D3dApp::CreateSwapChain() {
 		&swapChainDesc,
 		m_d3dSwapChain.GetAddressOf()
 	);
-	assert(!FAILED(hr));
+	assert(!(FAILED(hr)));
 
 }
 
@@ -323,7 +323,7 @@ void D3dApp::CreateDescriptorHeaps() {
 		&rtvHeapDesc,
 		IID_PPV_ARGS(&m_d3dRTVDescriptorHeap)
 	);
-	assert(!FAILED(hr));
+	assert(!(FAILED(hr)));
 
 	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
 	dsvHeapDesc.NumDescriptors = 1;
@@ -334,7 +334,7 @@ void D3dApp::CreateDescriptorHeaps() {
 		&dsvHeapDesc,
 		IID_PPV_ARGS(&m_d3dDSVDescriptorHeap)
 	);
-	assert(!FAILED(hr));
+	assert(!(FAILED(hr)));
 }
 
 void D3dApp::CreateRTViewAndBuffer() {
@@ -343,7 +343,7 @@ void D3dApp::CreateRTViewAndBuffer() {
 	for (int i = 0; i < s_backBufferCount; i++)
 	{
 		HRESULT hr = m_d3dSwapChain->GetBuffer(i, IID_PPV_ARGS(&m_d3dSwapChainBuffers[i]));
-		assert(!FAILED(hr));
+		assert(!(FAILED(hr)));
 		m_d3dDevice->CreateRenderTargetView(m_d3dSwapChainBuffers[i].Get(), nullptr, rtvHeapHandle);
 		rtvHeapHandle.Offset(1, m_RtvDescriptorSize);
 	}
@@ -376,7 +376,7 @@ void D3dApp::CreateDSViewAndBuffer() {
 		D3D12_RESOURCE_STATE_COMMON,
 		&optClear,
 		IID_PPV_ARGS(m_d3dDepthStencilBuffer.GetAddressOf()));
-	assert(!FAILED(hr));
+	assert(!(FAILED(hr)));
 }
 
 void D3dApp::FlushCommandQueue() {
@@ -384,7 +384,7 @@ void D3dApp::FlushCommandQueue() {
 	m_currentFenceValue++;
 
 	HRESULT hr = m_d3dCommandQueue->Signal(m_d3dFence.Get(), m_currentFenceValue);
-	assert(!FAILED(hr));
+	assert(!(FAILED(hr)));
 
 	if (m_d3dFence->GetCompletedValue() < m_currentFenceValue)
 	{
@@ -403,7 +403,7 @@ void D3dApp::OnResize() {
 	FlushCommandQueue();
 
 	HRESULT hr = m_d3dCommandList->Reset(m_d3dCommandAllocator.Get(), nullptr);
-	assert(!FAILED(hr));
+	assert(!(FAILED(hr)));
 
 	for (int i = 0; i < s_backBufferCount; i++)
 	{
@@ -417,7 +417,7 @@ void D3dApp::OnResize() {
 		m_backBufferFormat,
 		DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
 	);
-	assert(!FAILED(hr));
+	assert(!(FAILED(hr)));
 
 	m_currentBackBuffer = 0;
 
@@ -428,7 +428,7 @@ void D3dApp::OnResize() {
 		D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 
 	hr = m_d3dCommandList->Close();
-	assert(!FAILED(hr));
+	assert(!(FAILED(hr)));
 
 	ID3D12CommandList* cmdsLists[] = { m_d3dCommandList.Get() };
 	m_d3dCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
