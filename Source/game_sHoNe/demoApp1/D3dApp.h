@@ -40,6 +40,11 @@ protected:
 	virtual void Update(const GameTimer& gt) = 0;
 	virtual void Draw(const GameTimer& gt) = 0;
 	
+	// Convenience overrides for handling mouse input.
+	virtual void OnMouseDown(WPARAM btnState, int x, int y) { }
+	virtual void OnMouseUp(WPARAM btnState, int x, int y) { }
+	virtual void OnMouseMove(WPARAM btnState, int x, int y) { }
+
 	void CreateRTViewAndBuffer();
 	void CreateDSViewAndBuffer();
 
@@ -77,9 +82,9 @@ protected:
 
 	D3D12_VIEWPORT m_viewPort;
 	D3D12_RECT m_scissorRect;
+	HWND m_window;
 
 private:
-	HWND m_window;
 	HINSTANCE m_hInstance;
 	const std::wstring m_windowClassName = L"D3DAppMainWindow";
 	std::wstring m_mainWndCaption = L"d3d App";

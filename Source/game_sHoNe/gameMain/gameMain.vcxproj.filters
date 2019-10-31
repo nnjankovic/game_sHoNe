@@ -13,10 +13,63 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\GameView">
+      <UniqueIdentifier>{4651d762-cbd7-4b7e-884e-1acfb18ec9d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GameView">
+      <UniqueIdentifier>{dd6771ff-0019-4a80-a000-bfe859f4e7de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GameView\DrawItems">
+      <UniqueIdentifier>{3a856945-8673-406b-9ea7-c319c109246e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DrawItems">
+      <UniqueIdentifier>{97aef9c5-9b04-4485-85c6-0460a685a24c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="D3D12Renderer.cpp">
+      <Filter>Source Files\GameView</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BoxDrawItem.cpp">
+      <Filter>Source Files\DrawItems</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="IRenderer.h">
+      <Filter>Header Files\GameView</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D12Renderer.h">
+      <Filter>Header Files\GameView</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawItem.h">
+      <Filter>Header Files\GameView\DrawItems</Filter>
+    </ClInclude>
+    <ClInclude Include="BoxDrawItem.h">
+      <Filter>Header Files\GameView\DrawItems</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

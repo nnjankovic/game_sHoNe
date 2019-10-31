@@ -186,20 +186,19 @@ LRESULT  D3dApp::MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 			break;
 
 		case WM_LBUTTONDOWN:
-			break;
 		case WM_RBUTTONDOWN:
-			break;
 		case WM_MBUTTONDOWN:
+			OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			break;
 
 		case WM_LBUTTONUP:
-			break;
 		case WM_RBUTTONUP:
-			break;
 		case WM_MBUTTONUP:
+			OnMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			break;
 
 		case WM_MOUSEMOVE:
+			OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			break;
 
 		case WM_KEYUP:

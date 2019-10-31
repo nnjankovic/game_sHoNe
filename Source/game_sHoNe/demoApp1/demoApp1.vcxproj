@@ -141,16 +141,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BoxApp.h" />
     <ClInclude Include="D3dApp.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="InitD3D.h" />
+    <ClInclude Include="MathHelper.h" />
+    <ClInclude Include="UploadBuffer.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BoxApp.cpp" />
     <ClCompile Include="D3dApp.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="InitD3D.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,13 +4,14 @@
 #include<iostream>
 
 #include "InitD3D.h"
+#include "BoxApp.h"
 
 using namespace std;
 
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR    lpCmdLine, int nCmdShow)
 {
 
-	InitD3D app(hInstance);
+	BoxApp app(hInstance);
 
 	app.Initialize();
 
