@@ -34,7 +34,8 @@ bool BoxApp::Initialize() {
 	BuildGridGeometry();
 	BuildPipelineStateObject();
 
-	m_d3dCommandList->Close();
+	hr = m_d3dCommandList->Close();
+	assert(!(FAILED(hr)));
 	ID3D12CommandList* cmdsLists[] = { m_d3dCommandList.Get() };
 	m_d3dCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
@@ -59,7 +60,7 @@ void BoxApp::BuildConstantBuffers() {
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 	cbvDesc.BufferLocation = m_ObjectConstantBuffer->Resource()->GetGPUVirtualAddress();
-	cbvDesc.SizeInBytes = m_ObjectConstantBuffer->getElementSize();
+	cbvDesc.SizeInBytes = D3DUtils::CalcConstantBufferByteSize(sizeof(ObjectConstants));
 
 	m_d3dDevice->CreateConstantBufferView(
 		&cbvDesc,
@@ -97,10 +98,12 @@ void BoxApp::BuildRootSignature() {
 	}
 	assert(!(FAILED(hr)));
 
-	m_d3dDevice->CreateRootSignature(0,
+	hr = m_d3dDevice->CreateRootSignature(0,
 		serializedRootSignature->GetBufferPointer(),
 		serializedRootSignature->GetBufferSize(),
 		IID_PPV_ARGS(&m_RootSignature));
+
+	assert(!(FAILED(hr)));
 }
 
 void BoxApp::BuildShadersAndInputLayout() {
@@ -241,7 +244,7 @@ void BoxApp::BuildPyramidGeometry() {
 }
 
 void BoxApp::BuildBoxGeometry() {
-	std::array<Vertex, 8> vertices =
+	std::vector<Vertex> vertices =
 	{
 		Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) }),
 		Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black) }),
@@ -253,7 +256,7 @@ void BoxApp::BuildBoxGeometry() {
 		Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Salmon) })
 	};
 
-	std::array<std::uint16_t, 36> indices =
+	std::vector<std::uint16_t> indices =
 	{
 		// front face
 		0, 1, 2,
@@ -330,7 +333,7 @@ void BoxApp::BuildPipelineStateObject() {
 		m_PixelShaderByteCode->GetBufferSize()
 	};
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	//psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	psoDesc.SampleMask = UINT_MAX;
@@ -341,6 +344,14 @@ void BoxApp::BuildPipelineStateObject() {
 	psoDesc.SampleDesc.Quality = m_4xMsaaState ? (m_4xMsaaQuality - 1) : 0;
 	psoDesc.DSVFormat = m_depthStencilFormat;
 	m_d3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_PipelineStateObject));
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE BoxApp::CurrentBackBufferView() const
+{
+	return CD3DX12_CPU_DESCRIPTOR_HANDLE(
+		m_d3dRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+		m_currentBackBuffer,
+		m_RtvDescriptorSize);
 }
 
 void BoxApp::OnResize() {
@@ -385,11 +396,11 @@ void BoxApp::Draw(const GameTimer& gt){
 		D3D12_RESOURCE_STATE_PRESENT,
 		D3D12_RESOURCE_STATE_RENDER_TARGET));
 
-	CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(m_d3dRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_currentBackBuffer, m_RtvDescriptorSize);
-	m_d3dCommandList->ClearRenderTargetView(rtv, Colors::White, 0, nullptr);
-	m_d3dCommandList->ClearDepthStencilView(m_d3dDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+	//CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(m_d3dRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_currentBackBuffer, m_RtvDescriptorSize);
+	m_d3dCommandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::White, 0, nullptr);
+	m_d3dCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
-	m_d3dCommandList->OMSetRenderTargets(1, &rtv, true, &m_d3dDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	m_d3dCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = { m_CbvHeap.Get() };
 	m_d3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
@@ -398,12 +409,7 @@ void BoxApp::Draw(const GameTimer& gt){
 
 	m_d3dCommandList->SetPipelineState(m_PipelineStateObject.Get());
 
-	m_d3dCommandList->IASetVertexBuffers(0, 1, &m_BoxGeometry->VertexBufferView());
-	m_d3dCommandList->IASetIndexBuffer(&m_BoxGeometry->IndexBufferView());
-	m_d3dCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	m_d3dCommandList->SetGraphicsRootDescriptorTable(0, m_CbvHeap->GetGPUDescriptorHandleForHeapStart());
-	m_d3dCommandList->DrawIndexedInstanced(m_BoxGeometry->DrawArgs["box"].IndexCount, 1, 0, 0, 0);
+	
 
 	/*m_d3dCommandList->IASetVertexBuffers(0, 1, &m_PyramidGeometry->VertexBufferView());
 	m_d3dCommandList->IASetIndexBuffer(&m_PyramidGeometry->IndexBufferView());
@@ -419,6 +425,14 @@ void BoxApp::Draw(const GameTimer& gt){
 
 	m_d3dCommandList->SetGraphicsRootDescriptorTable(0, m_CbvHeap->GetGPUDescriptorHandleForHeapStart());
 	m_d3dCommandList->DrawIndexedInstanced(m_GridGeometry->DrawArgs["grid"].IndexCount, 1, 0, 0, 0);
+
+
+	m_d3dCommandList->IASetVertexBuffers(0, 1, &m_BoxGeometry->VertexBufferView());
+	m_d3dCommandList->IASetIndexBuffer(&m_BoxGeometry->IndexBufferView());
+	m_d3dCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	m_d3dCommandList->SetGraphicsRootDescriptorTable(0, m_CbvHeap->GetGPUDescriptorHandleForHeapStart());
+	m_d3dCommandList->DrawIndexedInstanced(m_BoxGeometry->DrawArgs["box"].IndexCount, 1, 0, 0, 0);
 
 	m_d3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_d3dSwapChainBuffers[m_currentBackBuffer].Get(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, //state before
@@ -480,4 +494,9 @@ void BoxApp::OnMouseMove(WPARAM btnState, int x, int y)
 
 	m_LastMousePos.x = x;
 	m_LastMousePos.y = y;
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE BoxApp::DepthStencilView()const
+{
+	return m_d3dDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 }

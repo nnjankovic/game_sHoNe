@@ -102,23 +102,20 @@ bool D3D12Renderer::PrepareDraw()
 
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(m_d3dRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_currentBackBuffer, m_RtvDescriptorSize);
-	m_d3dCommandList->ClearRenderTargetView(rtv, DirectX::Colors::Aqua, 0, nullptr);
+	m_d3dCommandList->ClearRenderTargetView(rtv, DirectX::Colors::Black, 0, nullptr);
 	m_d3dCommandList->ClearDepthStencilView(m_d3dDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
 	m_d3dCommandList->OMSetRenderTargets(1, &rtv, true, &m_d3dDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 
-	ID3D12DescriptorHeap* descriptorHeaps[] = { m_CbvHeap.Get() };
-	m_d3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-
-	m_d3dCommandList->SetGraphicsRootSignature(m_RootSignature.Get());
-
 
 	return true;
 }
 
-bool D3D12Renderer::Draw(const DrawItem & drawItem)
+bool D3D12Renderer::Draw(DrawItem & drawItem)
 {
+	//UploadStaticGeometry(drawItem);
+
 	XMMATRIX transformMatrix = XMLoadFloat4x4(&drawItem.m_properties.objectConstants.WorldViewProj);
 	XMMATRIX proj = XMLoadFloat4x4(&m_projectionMatrix);
 
@@ -128,8 +125,14 @@ bool D3D12Renderer::Draw(const DrawItem & drawItem)
 
 	XMStoreFloat4x4(&bla.WorldViewProj, XMMatrixTranspose(transformMatrix));
 
-	m_d3dCommandList->SetPipelineState(drawItem.m_properties.pipelineStateObject.Get());
 	m_ObjectConstantBuffer->setData(bla);
+
+	ID3D12DescriptorHeap* descriptorHeaps[] = { m_CbvHeap.Get() };
+	m_d3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
+	m_d3dCommandList->SetGraphicsRootSignature(m_RootSignature.Get());
+
+	m_d3dCommandList->SetPipelineState(drawItem.m_properties.pipelineStateObject.Get());
 
 	m_d3dCommandList->IASetVertexBuffers(0, 1, &drawItem.m_geometry.VertexBufferView());
 	m_d3dCommandList->IASetIndexBuffer(&drawItem.m_geometry.IndexBufferView());
@@ -164,7 +167,8 @@ void D3D12Renderer::Present()
 		D3D12_RESOURCE_STATE_RENDER_TARGET, //state before
 		D3D12_RESOURCE_STATE_PRESENT));	//state after
 
-	m_d3dCommandList->Close();
+	HRESULT hr = m_d3dCommandList->Close();
+	assert(!(FAILED(hr)));
 
 	ID3D12CommandList* ppCommandLists[] = { m_d3dCommandList.Get() };
 	m_d3dCommandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
@@ -194,7 +198,7 @@ void D3D12Renderer::createPSO(DrawItem & drawItem)
 		drawItem.m_properties.pixelShaderByteCode->GetBufferSize()
 	};
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	//psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	psoDesc.SampleMask = UINT_MAX;
@@ -379,6 +383,14 @@ void D3D12Renderer::CreateDSViewAndBuffer() {
 		&optClear,
 		IID_PPV_ARGS(m_d3dDepthStencilBuffer.GetAddressOf()));
 	assert(!(FAILED(hr)));
+
+	// Create descriptor to mip level 0 of entire resource using the format of the resource.
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Format = m_depthStencilFormat;
+	dsvDesc.Texture2D.MipSlice = 0;
+	m_d3dDevice->CreateDepthStencilView(m_d3dDepthStencilBuffer.Get(), &dsvDesc, m_d3dDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 void D3D12Renderer::CreateConstantBuffers()

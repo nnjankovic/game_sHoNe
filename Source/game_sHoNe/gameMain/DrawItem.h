@@ -41,12 +41,12 @@ struct GeometryData {
 
 	ComPtr<ID3D12Resource> VertexBufferGPU = nullptr;
 	ComPtr<ID3D12Resource> VertexBufferUploader = nullptr;
-	uint16_t VertexBufferSize;
-	uint16_t VertexByteStride;
+	UINT VertexBufferSize;
+	UINT VertexByteStride;
 	
 	ComPtr<ID3D12Resource> IndexBufferGPU = nullptr;
 	ComPtr<ID3D12Resource> IndexBufferUploader = nullptr;
-	uint16_t IndexBufferSize;
+	UINT IndexBufferSize;
 	DXGI_FORMAT IndexFormat = DXGI_FORMAT_R16_UINT;
 
 

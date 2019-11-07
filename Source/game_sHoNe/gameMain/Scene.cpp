@@ -1,6 +1,6 @@
 #include "Scene.h"
 
-
+#include "PlaneDrawItem.h"
 
 Scene::Scene(HINSTANCE hInstance) : m_hInstance(hInstance)
 {
@@ -15,8 +15,12 @@ void Scene::Init()
 	box->create();
 	m_Items.push_back(box);
 
+/*	auto plane = std::make_shared<PlaneDrawItem>(m_renderer);
+	plane->create();
+	m_Items.push_back(plane);*/
+
 	//For now this is hard coded will change when I add camera object and automatically update camera
-	XMVECTOR pos = XMVectorSet(2.5, 3.535, 2.5, 1.0f);
+	XMVECTOR pos = XMVectorSet(2.5f, 3.535f, 2.5f, 1.0f);
 	XMVECTOR target = XMVectorZero();
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 

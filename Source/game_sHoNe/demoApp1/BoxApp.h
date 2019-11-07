@@ -31,6 +31,7 @@ public:
 	void OnMouseDown(WPARAM btnState, int x, int y) override;
 	void OnMouseUp(WPARAM btnState, int x, int y) override;
 	void OnMouseMove(WPARAM btnState, int x, int y) override;
+	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const;
 	void OnResize() override;
 
 private:
@@ -46,6 +47,8 @@ private:
 	void BuildPyramidGeometry();
 
 	void BuildPipelineStateObject();
+
+	D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView()const;
 	
 private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CbvHeap;

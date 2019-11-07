@@ -22,7 +22,7 @@ public:
 	bool Exit() override;
 
 	bool PrepareDraw() override;
-	bool Draw(const DrawItem& drawItem) override;
+	bool Draw(DrawItem& drawItem) override;
 	bool UploadStaticGeometry(DrawItem& drawItem) override;
 	void Present() override;
 	void createPSO(DrawItem& drawItem) override;
@@ -51,7 +51,7 @@ private:
 	ComPtr<ID3D12Device>  m_d3dDevice;
 
 	ComPtr<ID3D12Fence>	  m_d3dFence;
-	int	m_currentFenceValue;
+	int	m_currentFenceValue = 0;
 
 	ComPtr<ID3D12CommandQueue>			m_d3dCommandQueue;
 	ComPtr<ID3D12CommandAllocator>		m_d3dCommandAllocator;

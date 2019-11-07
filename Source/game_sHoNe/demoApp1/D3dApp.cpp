@@ -320,7 +320,7 @@ void D3dApp::CreateDescriptorHeaps() {
 	rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	hr = m_d3dDevice->CreateDescriptorHeap(
 		&rtvHeapDesc,
-		IID_PPV_ARGS(&m_d3dRTVDescriptorHeap)
+		IID_PPV_ARGS(m_d3dRTVDescriptorHeap.GetAddressOf())
 	);
 	assert(!(FAILED(hr)));
 
@@ -331,7 +331,7 @@ void D3dApp::CreateDescriptorHeaps() {
 	dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	hr = m_d3dDevice->CreateDescriptorHeap(
 		&dsvHeapDesc,
-		IID_PPV_ARGS(&m_d3dDSVDescriptorHeap)
+		IID_PPV_ARGS(m_d3dDSVDescriptorHeap.GetAddressOf())
 	);
 	assert(!(FAILED(hr)));
 }
@@ -376,6 +376,14 @@ void D3dApp::CreateDSViewAndBuffer() {
 		&optClear,
 		IID_PPV_ARGS(m_d3dDepthStencilBuffer.GetAddressOf()));
 	assert(!(FAILED(hr)));
+
+	// Create descriptor to mip level 0 of entire resource using the format of the resource.
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Format = m_depthStencilFormat;
+	dsvDesc.Texture2D.MipSlice = 0;
+	m_d3dDevice->CreateDepthStencilView(m_d3dDepthStencilBuffer.Get(), &dsvDesc, m_d3dDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 void D3dApp::FlushCommandQueue() {
