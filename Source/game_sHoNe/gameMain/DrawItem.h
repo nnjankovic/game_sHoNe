@@ -14,14 +14,25 @@ using namespace DirectX::PackedVector;
 
 struct Vertex
 {
+	Vertex(float x, float y, float z,
+		float m, float n
+	) : Pos(x, y, z), TexC(m, n), hasTexture(1) {}
+
+	Vertex(XMFLOAT3 pos, XMFLOAT4 color) : Pos(pos), Color(color), hasTexture(0) {}
+
 	XMFLOAT3 Pos;
 	XMFLOAT4 Color;
+
+	XMFLOAT2 TexC;
+	int hasTexture; //0 NO TEXTURE;  
 };
 
-struct WorldPosition {
-	float x;
-	float y;
-	float z;
+struct Texture {
+	std::wstring name;
+	std::wstring fileName;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> Resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap = nullptr;
 };
 
 struct DrawItemProperties {
@@ -32,7 +43,9 @@ struct DrawItemProperties {
 	std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout;
 
 	ObjectConstants objectConstants;
-	WorldPosition position;
+	MathHelper::PositionVector position;
+
+	Texture texture;
 };
 
 struct GeometryData {
@@ -91,6 +104,7 @@ public:
 protected:
 	virtual bool createShadersAndInputLayout() = 0;
 	virtual bool loadGeometry() = 0;
+	virtual bool loadTexture() { return false; }
 
 protected:
 	GeometryData m_geometry;

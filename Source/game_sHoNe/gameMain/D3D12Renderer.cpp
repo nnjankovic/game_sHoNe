@@ -1,6 +1,9 @@
 #include "D3D12Renderer.h"
 #include <WindowsX.h>
 #include "DrawItem.h"
+#include "WindowConstants.h"
+
+#include "DDSTextureLoader.h"
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	D3D12Renderer* d3d12Renderer = NULL;
@@ -77,6 +80,9 @@ bool D3D12Renderer::Init() {
 
 	OnResize();
 
+	HRESULT hr = m_d3dCommandList->Reset(m_d3dCommandAllocator.Get(), nullptr);
+	assert(!(FAILED(hr)));
+
 	return true;
 }
 
@@ -114,8 +120,6 @@ bool D3D12Renderer::PrepareDraw()
 
 bool D3D12Renderer::Draw(DrawItem & drawItem)
 {
-	//UploadStaticGeometry(drawItem);
-
 	XMMATRIX transformMatrix = XMLoadFloat4x4(&drawItem.m_properties.objectConstants.WorldViewProj);
 	XMMATRIX proj = XMLoadFloat4x4(&m_projectionMatrix);
 
@@ -144,21 +148,33 @@ bool D3D12Renderer::Draw(DrawItem & drawItem)
 	return true;
 }
 
-bool D3D12Renderer::UploadStaticGeometry(DrawItem & drawItem)
+bool D3D12Renderer::UploadStaticGeometry(std::vector<std::shared_ptr<DrawItem>> staticDrawItems)
 {
-	drawItem.m_geometry.VertexBufferGPU = CreateDefaultBuffer(m_d3dDevice.Get(), m_d3dCommandList.Get(),
-		drawItem.m_geometry.vertices.data(), drawItem.m_geometry.VertexBufferSize, drawItem.m_geometry.VertexBufferUploader);
+	for (auto& drawItem : staticDrawItems)
+	{
+		drawItem->m_geometry.VertexBufferGPU = CreateDefaultBuffer(m_d3dDevice.Get(), m_d3dCommandList.Get(),
+			drawItem->m_geometry.vertices.data(), drawItem->m_geometry.VertexBufferSize, drawItem->m_geometry.VertexBufferUploader);
 
-	drawItem.m_geometry.IndexBufferGPU = CreateDefaultBuffer(m_d3dDevice.Get(),
-		m_d3dCommandList.Get(), drawItem.m_geometry.indices.data(), drawItem.m_geometry.IndexBufferSize, drawItem.m_geometry.IndexBufferUploader);
+		drawItem->m_geometry.IndexBufferGPU = CreateDefaultBuffer(m_d3dDevice.Get(),
+			m_d3dCommandList.Get(), drawItem->m_geometry.indices.data(), drawItem->m_geometry.IndexBufferSize, drawItem->m_geometry.IndexBufferUploader);
+	}
 
-	m_d3dCommandList->Close();
+	HRESULT hr = m_d3dCommandList->Close();
+	assert(!(FAILED(hr)));
+
 	ID3D12CommandList* cmdsLists[] = { m_d3dCommandList.Get() };
 	m_d3dCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
-	FlushCommandQueue();
-
 	return true;
+}
+
+bool D3D12Renderer::UploadTexture(Texture & texture)
+{
+	assert(!texture.fileName.empty());
+
+	HRESULT res = CreateDDSTextureFromFile12(m_d3dDevice.Get(), m_d3dCommandList.Get(), texture.fileName.c_str(), texture.Resource, texture.UploadHeap);
+
+	return !FAILED(res);
 }
 
 void D3D12Renderer::Present()
@@ -338,8 +354,18 @@ void D3D12Renderer::CreateDescriptorHeaps() {
 	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	cbvHeapDesc.NodeMask = 0;
+	m_d3dDevice->CreateDescriptorHeap(
+		&cbvHeapDesc,
+		IID_PPV_ARGS(&m_CbvHeap));
+	assert(!(FAILED(hr)));
 
-	m_d3dDevice->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&m_CbvHeap));
+	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+	srvHeapDesc.NumDescriptors = 1;
+	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	hr = m_d3dDevice->CreateDescriptorHeap(
+		&srvHeapDesc,
+		IID_PPV_ARGS(&m_SrvDescriptorHeap));
 	assert(!(FAILED(hr)));
 }
 
@@ -561,8 +587,22 @@ LRESULT  D3D12Renderer::windowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 		{
 			PostQuitMessage(0);
 		}
+		else
+		{
+			HWND inputListener = FindWindow(USER_INPUT_LISTENER.c_str(), USER_INPUT_LISTENER.c_str());
+			if (inputListener)
+				bool res = SendNotifyMessage(inputListener, WM_APP_KEYUP, wParam, lParam);	
+		}
 		break;
-
+	case WM_KEYDOWN:
+	{
+		HWND inputListener = FindWindow(USER_INPUT_LISTENER.c_str(), USER_INPUT_LISTENER.c_str());
+		if (inputListener)
+			bool res = SendNotifyMessage(inputListener, WM_APP_KEYDOWN, wParam, lParam);
+	}
+		break;
+	case WM_APP:
+		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 		break;

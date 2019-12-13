@@ -1,3 +1,2 @@
-﻿  D3dApp.cpp
-  demoApp1.vcxproj -> E:\game_sHoNe\Source\game_sHoNe\Debug\demoApp1.exe
-  demoApp1.vcxproj -> E:\game_sHoNe\Source\game_sHoNe\Debug\demoApp1.pdb (Partial PDB)
+﻿MSVCRTD.lib(exe_main.obj) : error LNK2019: unresolved external symbol _main referenced in function "int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ)
+C:\Users\nenad.n.jankovic\Documents\GitHub\game_sHoNe\Source\game_sHoNe\Debug\demoApp1.exe : fatal error LNK1120: 1 unresolved externals

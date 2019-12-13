@@ -2,16 +2,21 @@
 
 
 
-BoxDrawItem::BoxDrawItem(std::shared_ptr<IRenderer> renderer): DrawItem(renderer)
+BoxDrawItem::BoxDrawItem(std::shared_ptr<IRenderer> renderer, float x, float y, float z, float width, float height, float depth): 
+	DrawItem(renderer),
+	m_height(height),
+	m_width(width),
+	m_depth(depth)
 {
 	//TODO: temporarly here remove hardcoded values from constructor
-	m_properties.position.x = 0;
-	m_properties.position.y = 0;
-	m_properties.position.z = 0;
+	m_properties.position.x = x;
+	m_properties.position.y = y;
+	m_properties.position.z = z;
 }
 
 BoxDrawItem::~BoxDrawItem()
 {
+
 }
 
 bool BoxDrawItem::createShadersAndInputLayout()
@@ -30,18 +35,53 @@ bool BoxDrawItem::createShadersAndInputLayout()
 
 bool BoxDrawItem::loadGeometry()
 {
+	float w = 0.5*m_width;
+	float h = 0.5*m_height;
+	float d = 0.5*m_depth;
+
 	m_geometry.vertices =
 	{
-		Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) }),
-		Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black) }),
-		Vertex({ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red) }),
-		Vertex({ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Blue) }),
-		Vertex({ XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Turquoise) }),
-		Vertex({ XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Goldenrod) }),
-		Vertex({ XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow) }),
-		Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Salmon) })
+		Vertex({ XMFLOAT3(m_properties.position.x - w,
+						  m_properties.position.y - h, 
+						  m_properties.position.z - d),
+						  XMFLOAT4(Colors::White) }),
+
+		Vertex({ XMFLOAT3(m_properties.position.x - w, 
+						  m_properties.position.y + h,
+						  m_properties.position.z - d),
+						  XMFLOAT4(Colors::Black) }),
+
+		Vertex({ XMFLOAT3(m_properties.position.x + w,
+						  m_properties.position.y + h, 
+						  m_properties.position.z - d), 
+						  XMFLOAT4(Colors::Red) }),
+
+		Vertex({ XMFLOAT3(m_properties.position.x + w, 
+						  m_properties.position.y - h, 
+						  m_properties.position.z - d), 
+						  XMFLOAT4(Colors::Blue) }),
+
+		Vertex({ XMFLOAT3(m_properties.position.x - w, 
+						  m_properties.position.y - h, 
+						  m_properties.position.z + d), 
+						  XMFLOAT4(Colors::Turquoise) }),
+
+		Vertex({ XMFLOAT3(m_properties.position.x - w, 
+						  m_properties.position.y + h, 
+						  m_properties.position.z + d), 
+						  XMFLOAT4(Colors::Goldenrod) }),
+
+		Vertex({ XMFLOAT3(m_properties.position.x + w, 
+						  m_properties.position.y + h, 
+						  m_properties.position.z + d), 
+						  XMFLOAT4(Colors::Yellow) }),
+
+		Vertex({ XMFLOAT3(m_properties.position.x + w, 
+						  m_properties.position.y - h, 
+						  m_properties.position.z + d), 
+						  XMFLOAT4(Colors::Salmon) })
 	};
-	m_geometry.VertexBufferSize = static_cast<uint16_t>(m_geometry.vertices.size()) * sizeof(Vertex);
+	m_geometry.VertexBufferSize = static_cast<UINT>(m_geometry.vertices.size()) * sizeof(Vertex);
 	m_geometry.VertexByteStride = sizeof(Vertex);
 
 	m_geometry.indices =
@@ -70,9 +110,8 @@ bool BoxDrawItem::loadGeometry()
 		4, 0, 3,
 		4, 3, 7
 	};
-	m_geometry.IndexBufferSize = static_cast<uint16_t>(m_geometry.indices.size()) * sizeof(uint16_t);
-
-	m_renderer->UploadStaticGeometry(*this);
+	m_geometry.IndexBufferSize = static_cast<UINT>(m_geometry.indices.size()) * sizeof(uint16_t);
 
 	return true;
 }
+

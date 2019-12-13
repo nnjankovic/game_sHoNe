@@ -32,8 +32,8 @@ bool PlaneDrawItem::createShadersAndInputLayout()
 
 bool PlaneDrawItem::loadGeometry()
 {
-	int n = 9;
-	int m = 9;
+	int n = 50;
+	int m = 50;
 
 	int numOfVertices = n*m;
 
@@ -46,8 +46,15 @@ bool PlaneDrawItem::loadGeometry()
 			float y = 0;
 			float x = j - (m - 1) / 2;
 
+			XMFLOAT4 color;
+
+			if (i % 2)
+				color = XMFLOAT4(Colors::Black);
+			else
+				color = XMFLOAT4(Colors::White);
+
 			vertices.push_back(
-				Vertex({ XMFLOAT3(x, y,z), XMFLOAT4(Colors::Red) })
+				Vertex({ XMFLOAT3(x, y,z), color })
 			);
 		}
 
@@ -72,8 +79,6 @@ bool PlaneDrawItem::loadGeometry()
 	m_geometry.VertexBufferSize = static_cast<uint16_t>(m_geometry.vertices.size()) * sizeof(Vertex);
 	m_geometry.VertexByteStride = sizeof(Vertex);
 	m_geometry.IndexBufferSize = static_cast<uint16_t>(m_geometry.indices.size()) * sizeof(uint16_t);
-
-	m_renderer->UploadStaticGeometry(*this);
 
 	return true;
 }

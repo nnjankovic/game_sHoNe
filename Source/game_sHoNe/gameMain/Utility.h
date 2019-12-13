@@ -36,6 +36,12 @@ using Microsoft::WRL::ComPtr;
 
 
 namespace MathHelper {
+	struct PositionVector {
+		float x;
+		float y;
+		float z;
+	};
+
 	static DirectX::XMFLOAT4X4 Identity4x4()
 	{
 		static DirectX::XMFLOAT4X4 I(

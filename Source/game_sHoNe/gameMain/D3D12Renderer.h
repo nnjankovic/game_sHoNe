@@ -23,10 +23,10 @@ public:
 
 	bool PrepareDraw() override;
 	bool Draw(DrawItem& drawItem) override;
-	bool UploadStaticGeometry(DrawItem& drawItem) override;
+	bool UploadStaticGeometry(std::vector<std::shared_ptr<DrawItem>> staticDrawItems) override;
+	bool UploadTexture(Texture& texture) override;
 	void Present() override;
 	void createPSO(DrawItem& drawItem) override;
-
 
 	LRESULT CALLBACK windowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -75,6 +75,7 @@ private:
 	ComPtr<ID3D12DescriptorHeap> m_d3dRTVDescriptorHeap;
 	ComPtr<ID3D12DescriptorHeap> m_d3dDSVDescriptorHeap;
 	ComPtr<ID3D12DescriptorHeap> m_CbvHeap;
+	ComPtr<ID3D12DescriptorHeap> m_SrvDescriptorHeap;
 
 	ComPtr<ID3D12RootSignature> m_RootSignature;
 
@@ -95,7 +96,9 @@ private:
 
 	std::unique_ptr<uplooad_helper<ObjectConstants>> m_ObjectConstantBuffer;
 
-	XMFLOAT4X4 m_projectionMatrix = MathHelper::Identity4x4(); //Depends on height/width ratio (screen size) used to project 3d vertices to 2d screen space
+	XMFLOAT4X4 m_projectionMatrix = MathHelper::Identity4x4();
+	
+	//Depends on height/width ratio (screen size) used to project 3d vertices to 2d screen space
 };
 
 #endif

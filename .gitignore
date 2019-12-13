@@ -1,3 +1,18 @@
 
 *.opendb
 *.db
+*.exe
+*.iobj
+*.pdb
+*.ipdb
+*.pdb
+*.pdb
+*.ipch
+*.tlog
+*.obj
+*.obj
+*.idb
+*.ilk
+*.exe
+*.ilk
+*.pdb

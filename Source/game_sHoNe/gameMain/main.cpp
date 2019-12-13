@@ -1,10 +1,16 @@
 #include "Scene.h"
+#include "UserControllerListener.h"
 
 using namespace std;
 
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR    lpCmdLine, int nCmdShow)
-{
-	Scene scene(hInstance);
+{	
+	auto gameTimer = make_shared<GameTimer>();
+
+	auto inputListener = make_shared<UserControllerListener>(hInstance);
+	inputListener->Start();
+
+	Scene scene(hInstance, inputListener, gameTimer);
 	scene.Init();
 
 	MSG msg = { 0 };
@@ -18,6 +24,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR    lp
 		}
 		else
 		{
+			gameTimer->Tick();
 			scene.Draw();
 		}
 	}
