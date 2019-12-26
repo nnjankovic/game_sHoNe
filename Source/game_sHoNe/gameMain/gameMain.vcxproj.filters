@@ -60,6 +60,9 @@
     <ClCompile Include="DrawItem.cpp">
       <Filter>Source Files\DrawItems</Filter>
     </ClCompile>
+    <ClCompile Include="TexturedBox.cpp">
+      <Filter>Source Files\DrawItems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IRenderer.h">
@@ -100,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="DDSTextureLoader.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TexturedBox.h">
+      <Filter>Header Files\GameView\DrawItems</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

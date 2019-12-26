@@ -30,6 +30,8 @@ public:
 
 	LRESULT CALLBACK windowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+	std::vector<CD3DX12_STATIC_SAMPLER_DESC> GetStaticSamplers();
+
 	~D3D12Renderer() {};
 
 private:

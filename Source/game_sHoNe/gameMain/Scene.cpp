@@ -1,6 +1,7 @@
 #include "Scene.h"
 
 #include "PlaneDrawItem.h"
+#include "TexturedBox.h"
 
 Scene::Scene(HINSTANCE hInstance, std::shared_ptr<UserControllerListener> userControlListener, std::shared_ptr<GameTimer> timer) : 
 	m_hInstance(hInstance),
@@ -17,7 +18,7 @@ void Scene::Init()
 
 	UploadTextures();
 
-	auto box1 = std::make_shared<BoxDrawItem>(m_renderer, 0, 5, 0);
+	/*auto box1 = std::make_shared<BoxDrawItem>(m_renderer, 0, 5, 0);
 	box1->create();
 	m_Items.push_back(box1);
 
@@ -31,7 +32,11 @@ void Scene::Init()
 
 	auto box4 = std::make_shared<BoxDrawItem>(m_renderer, -5, 6, 0, 2, 2, 2);
 	box4->create();
-	m_Items.push_back(box4);
+	m_Items.push_back(box4);*/
+
+	auto texBox1 = std::make_shared<TexturedBox>(m_renderer, -5, 6, 0, 2, 2, 2, m_textures[L"woodCrate"]);
+	texBox1->create();
+	m_Items.push_back(texBox1);
 
 	auto plane = std::make_shared<PlaneDrawItem>(m_renderer);
 	plane->create();
@@ -67,7 +72,7 @@ void Scene::UploadTextures()
 {
 	Texture woodCrateTexture;
 	woodCrateTexture.name = L"woodCrate";
-	woodCrateTexture.fileName = L"../../Assets/Textures/WoodCrate01.dds";
+	woodCrateTexture.fileName = L"..\\..\\..\\Assets\\Textures\\WoodCrate01.dds";
 
 	m_renderer->UploadTexture(woodCrateTexture);
 

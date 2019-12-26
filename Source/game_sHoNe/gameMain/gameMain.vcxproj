@@ -140,6 +140,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlaneDrawItem.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="TexturedBox.cpp" />
     <ClCompile Include="UserControllerListener.cpp" />
     <ClCompile Include="Utility.cpp" />
   </ItemGroup>
@@ -154,6 +155,7 @@
     <ClInclude Include="IRenderer.h" />
     <ClInclude Include="PlaneDrawItem.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="TexturedBox.h" />
     <ClInclude Include="UserControllerListener.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="WindowConstants.h" />

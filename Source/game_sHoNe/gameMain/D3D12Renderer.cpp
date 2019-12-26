@@ -143,6 +143,11 @@ bool D3D12Renderer::Draw(DrawItem & drawItem)
 	m_d3dCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	m_d3dCommandList->SetGraphicsRootDescriptorTable(0, m_CbvHeap->GetGPUDescriptorHandleForHeapStart());
+
+	if (drawItem.m_properties.isTextured) {
+		m_d3dCommandList->SetGraphicsRootDescriptorTable(1, m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+	}
+
 	m_d3dCommandList->DrawIndexedInstanced(drawItem.m_geometry.indices.size(), 1, 0, 0, 0);
 
 	return true;
@@ -174,7 +179,21 @@ bool D3D12Renderer::UploadTexture(Texture & texture)
 
 	HRESULT res = CreateDDSTextureFromFile12(m_d3dDevice.Get(), m_d3dCommandList.Get(), texture.fileName.c_str(), texture.Resource, texture.UploadHeap);
 
-	return !FAILED(res);
+	if (FAILED(res))
+		return false;
+
+	//Create shader resource view
+	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(m_SrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = texture.Resource->GetDesc().Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = texture.Resource->GetDesc().MipLevels;
+	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+	m_d3dDevice->CreateShaderResourceView(texture.Resource.Get(), &srvDesc, hDescriptor);
+
+	return true;
 }
 
 void D3D12Renderer::Present()
@@ -224,7 +243,7 @@ void D3D12Renderer::createPSO(DrawItem & drawItem)
 	psoDesc.SampleDesc.Count = m_4xMsaaState ? 4 : 1;
 	psoDesc.SampleDesc.Quality = m_4xMsaaState ? (m_4xMsaaQuality - 1) : 0;
 	psoDesc.DSVFormat = m_depthStencilFormat;
-	m_d3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&drawItem.m_properties.pipelineStateObject));
+	HRESULT hr = m_d3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&drawItem.m_properties.pipelineStateObject));
 }
 
 bool D3D12Renderer::InitD3D() {
@@ -435,18 +454,24 @@ void D3D12Renderer::CreateConstantBuffers()
 
 void D3D12Renderer::CreateRootSignature()
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[1];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
 
 	CD3DX12_DESCRIPTOR_RANGE cbvTable;
 	cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
 
+	CD3DX12_DESCRIPTOR_RANGE texTable;
+	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+
 	slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
+	slotRootParameter[1].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
+
+	auto staticSamplers = GetStaticSamplers();
 
 	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
 		1,
 		slotRootParameter,
-		0,
-		nullptr,
+		(UINT)staticSamplers.size(),
+		staticSamplers.data(),
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
 	);
 
@@ -609,4 +634,61 @@ LRESULT  D3D12Renderer::windowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 	}
 
 	return 0;
+}
+
+std::vector<CD3DX12_STATIC_SAMPLER_DESC> D3D12Renderer::GetStaticSamplers()
+{
+	// Applications usually only need a handful of samplers.  So just define them all up front
+	// and keep them available as part of the root signature.  
+
+	const CD3DX12_STATIC_SAMPLER_DESC pointWrap(
+		0, // shaderRegister
+		D3D12_FILTER_MIN_MAG_MIP_POINT, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP); // addressW
+
+	const CD3DX12_STATIC_SAMPLER_DESC pointClamp(
+		1, // shaderRegister
+		D3D12_FILTER_MIN_MAG_MIP_POINT, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP); // addressW
+
+	const CD3DX12_STATIC_SAMPLER_DESC linearWrap(
+		2, // shaderRegister
+		D3D12_FILTER_MIN_MAG_MIP_LINEAR, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP); // addressW
+
+	const CD3DX12_STATIC_SAMPLER_DESC linearClamp(
+		3, // shaderRegister
+		D3D12_FILTER_MIN_MAG_MIP_LINEAR, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP); // addressW
+
+	const CD3DX12_STATIC_SAMPLER_DESC anisotropicWrap(
+		4, // shaderRegister
+		D3D12_FILTER_ANISOTROPIC, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressW
+		0.0f,                             // mipLODBias
+		8);                               // maxAnisotropy
+
+	const CD3DX12_STATIC_SAMPLER_DESC anisotropicClamp(
+		5, // shaderRegister
+		D3D12_FILTER_ANISOTROPIC, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressW
+		0.0f,                              // mipLODBias
+		8);                                // maxAnisotropy
+
+	return {
+		pointWrap, pointClamp,
+		linearWrap, linearClamp,
+		anisotropicWrap, anisotropicClamp };
 }

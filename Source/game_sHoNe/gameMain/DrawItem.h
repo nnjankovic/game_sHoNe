@@ -20,6 +20,8 @@ struct Vertex
 
 	Vertex(XMFLOAT3 pos, XMFLOAT4 color) : Pos(pos), Color(color), hasTexture(0) {}
 
+	Vertex() {}
+
 	XMFLOAT3 Pos;
 	XMFLOAT4 Color;
 
@@ -46,6 +48,8 @@ struct DrawItemProperties {
 	MathHelper::PositionVector position;
 
 	Texture texture;
+
+	bool isTextured = false;
 };
 
 struct GeometryData {

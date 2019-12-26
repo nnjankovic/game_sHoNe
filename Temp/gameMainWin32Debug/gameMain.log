@@ -1,0 +1,14 @@
+﻿  BoxDrawItem.cpp
+  D3D12Renderer.cpp
+c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\gamemain\d3d12renderer.cpp(501): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+  DrawItem.cpp
+  GameTimer.cpp
+  main.cpp
+  PlaneDrawItem.cpp
+c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\gamemain\planedrawitem.cpp(45): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\gamemain\planedrawitem.cpp(47): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+  Scene.cpp
+  Utility.cpp
+c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\gamemain\utility.cpp(52): warning C4244: '=': conversion from 'UINT64' to 'LONG_PTR', possible loss of data
+  Generating Code...
+  gameMain.vcxproj -> C:\Users\nenad.n.jankovic\Documents\GitHub\game_sHoNe\Source\game_sHoNe\gameMain\..\..\..\Test\Win32Debug\gameMainWin32Debug.exe
