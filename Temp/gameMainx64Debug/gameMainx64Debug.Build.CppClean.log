@@ -1,6 +1,7 @@
 c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\vc141.pdb
 c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\vc141.idb
 c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\utility.obj
+c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\usercontrollerlistener.obj
 c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\scene.obj
 c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\planedrawitem.obj
 c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\main.obj
@@ -8,7 +9,9 @@ c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\game
 c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\drawitem.obj
 c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\d3d12renderer.obj
 c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\boxdrawitem.obj
-c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\usercontrollerlistener.obj
+c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\cameranode.obj
+c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\ddstextureloader.obj
+c:\users\nenad.n.jankovic\documents\github\game_shone\temp\gamemainx64debug\texturedbox.obj
 c:\users\nenad.n.jankovic\documents\github\game_shone\test\x64debug\gamemainx64debug.exe
 c:\users\nenad.n.jankovic\documents\github\game_shone\test\x64debug\gamemainx64debug.ilk
 c:\users\nenad.n.jankovic\documents\github\game_shone\test\x64debug\gamemainx64debug.pdb

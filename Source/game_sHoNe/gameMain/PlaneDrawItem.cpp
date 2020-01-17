@@ -73,10 +73,10 @@ bool PlaneDrawItem::loadGeometry()
 			indices.push_back((i + 1)*n + j + 1);
 		}
 
-	m_geometry.vertices = vertices;
+	m_geometry.vertices = vertices;//.data();
 	m_geometry.indices = indices;
 
-	m_geometry.VertexBufferSize = static_cast<uint16_t>(m_geometry.vertices.size()) * sizeof(Vertex);
+	m_geometry.VertexBufferSize = static_cast<uint16_t>(vertices.size()) * sizeof(Vertex);
 	m_geometry.VertexByteStride = sizeof(Vertex);
 	m_geometry.IndexBufferSize = static_cast<uint16_t>(m_geometry.indices.size()) * sizeof(uint16_t);
 

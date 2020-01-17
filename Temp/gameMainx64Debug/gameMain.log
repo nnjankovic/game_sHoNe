@@ -1,4 +1,18 @@
-﻿  D3D12Renderer.cpp
-c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\gamemain\d3d12renderer.cpp(151): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\gamemain\d3d12renderer.cpp(562): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+﻿  Scene.cpp
+c:\program files (x86)\microsoft visual studio\2017\professional\vc\tools\msvc\14.16.27023\include\memory(1801): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\professional\vc\tools\msvc\14.16.27023\include\memory(1866): note: see reference to function template instantiation 'std::_Ref_count_obj<_Ty>::_Ref_count_obj<std::shared_ptr<IRenderer>&,int,int,int>(std::shared_ptr<IRenderer> &,int &&,int &&,int &&)' being compiled
+          with
+          [
+              _Ty=BoxDrawItem
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\professional\vc\tools\msvc\14.16.27023\include\memory(1866): note: see reference to function template instantiation 'std::_Ref_count_obj<_Ty>::_Ref_count_obj<std::shared_ptr<IRenderer>&,int,int,int>(std::shared_ptr<IRenderer> &,int &&,int &&,int &&)' being compiled
+          with
+          [
+              _Ty=BoxDrawItem
+          ]
+  c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\gamemain\scene.cpp(21): note: see reference to function template instantiation 'std::shared_ptr<BoxDrawItem> std::make_shared<BoxDrawItem,std::shared_ptr<IRenderer>&,int,int,int>(std::shared_ptr<IRenderer> &,int &&,int &&,int &&)' being compiled
   gameMain.vcxproj -> C:\Users\nenad.n.jankovic\Documents\GitHub\game_sHoNe\Source\game_sHoNe\gameMain\..\..\..\Test\x64Debug\gameMainx64Debug.exe

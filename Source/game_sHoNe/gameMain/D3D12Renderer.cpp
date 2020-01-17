@@ -24,8 +24,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
 D3D12Renderer::D3D12Renderer(HINSTANCE hInstance) :
 	m_hInstance(hInstance),
-	m_screenHeight(600),
-	m_screenWidth(800)
+	m_screenHeight(800),
+	m_screenWidth(1024)
 {
 
 }
@@ -131,8 +131,11 @@ bool D3D12Renderer::Draw(DrawItem & drawItem)
 
 	m_ObjectConstantBuffer->setData(bla);
 
-	ID3D12DescriptorHeap* descriptorHeaps[] = { m_CbvHeap.Get() };
+	ID3D12DescriptorHeap* descriptorHeaps[] = { m_SrvDescriptorHeap.Get()/*, m_SrvDescriptorHeap.Get()*/};
 	m_d3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
+	//ID3D12DescriptorHeap* descriptorHeaps1[] = { m_SrvDescriptorHeap.Get() };
+	//m_d3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps1), descriptorHeaps1);
 
 	m_d3dCommandList->SetGraphicsRootSignature(m_RootSignature.Get());
 
@@ -142,7 +145,8 @@ bool D3D12Renderer::Draw(DrawItem & drawItem)
 	m_d3dCommandList->IASetIndexBuffer(&drawItem.m_geometry.IndexBufferView());
 	m_d3dCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	m_d3dCommandList->SetGraphicsRootDescriptorTable(0, m_CbvHeap->GetGPUDescriptorHandleForHeapStart());
+	//m_d3dCommandList->SetGraphicsRootDescriptorTable(0, m_CbvHeap->GetGPUDescriptorHandleForHeapStart());
+	m_d3dCommandList->SetGraphicsRootConstantBufferView(0, m_ObjectConstantBuffer->Resource()->GetGPUVirtualAddress());
 
 	if (drawItem.m_properties.isTextured) {
 		m_d3dCommandList->SetGraphicsRootDescriptorTable(1, m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
@@ -157,8 +161,12 @@ bool D3D12Renderer::UploadStaticGeometry(std::vector<std::shared_ptr<DrawItem>> 
 {
 	for (auto& drawItem : staticDrawItems)
 	{
-		drawItem->m_geometry.VertexBufferGPU = CreateDefaultBuffer(m_d3dDevice.Get(), m_d3dCommandList.Get(),
-			drawItem->m_geometry.vertices.data(), drawItem->m_geometry.VertexBufferSize, drawItem->m_geometry.VertexBufferUploader);
+		if(drawItem->m_properties.isTextured)
+			drawItem->m_geometry.VertexBufferGPU = CreateDefaultBuffer(m_d3dDevice.Get(), m_d3dCommandList.Get(), drawItem->m_geometry.texVertices.data(),
+				drawItem->m_geometry.VertexBufferSize, drawItem->m_geometry.VertexBufferUploader);
+		else
+			drawItem->m_geometry.VertexBufferGPU = CreateDefaultBuffer(m_d3dDevice.Get(), m_d3dCommandList.Get(), drawItem->m_geometry.vertices.data(),
+				drawItem->m_geometry.VertexBufferSize, drawItem->m_geometry.VertexBufferUploader);
 
 		drawItem->m_geometry.IndexBufferGPU = CreateDefaultBuffer(m_d3dDevice.Get(),
 			m_d3dCommandList.Get(), drawItem->m_geometry.indices.data(), drawItem->m_geometry.IndexBufferSize, drawItem->m_geometry.IndexBufferUploader);
@@ -442,33 +450,33 @@ void D3D12Renderer::CreateConstantBuffers()
 {
 	m_ObjectConstantBuffer = std::make_unique<uplooad_helper<ObjectConstants>>(m_d3dDevice.Get(), 1, true);
 
-	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
+	/*D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 	cbvDesc.BufferLocation = m_ObjectConstantBuffer->Resource()->GetGPUVirtualAddress();
 	cbvDesc.SizeInBytes = m_ObjectConstantBuffer->getElementSize();
 
 	m_d3dDevice->CreateConstantBufferView(
 		&cbvDesc,
 		m_CbvHeap->GetCPUDescriptorHandleForHeapStart()
-	);
+	);*/
 }
 
 void D3D12Renderer::CreateRootSignature()
 {
 	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
 
-	CD3DX12_DESCRIPTOR_RANGE cbvTable;
-	cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+	//CD3DX12_DESCRIPTOR_RANGE cbvTable;
+	//cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
 
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
-	slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
+	slotRootParameter[0].InitAsConstantBufferView(0);
 	slotRootParameter[1].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
 
 	auto staticSamplers = GetStaticSamplers();
 
 	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
-		1,
+		2,
 		slotRootParameter,
 		(UINT)staticSamplers.size(),
 		staticSamplers.data(),

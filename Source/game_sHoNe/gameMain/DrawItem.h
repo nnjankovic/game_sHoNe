@@ -14,19 +14,18 @@ using namespace DirectX::PackedVector;
 
 struct Vertex
 {
-	Vertex(float x, float y, float z,
-		float m, float n
-	) : Pos(x, y, z), TexC(m, n), hasTexture(1) {}
-
-	Vertex(XMFLOAT3 pos, XMFLOAT4 color) : Pos(pos), Color(color), hasTexture(0) {}
-
-	Vertex() {}
-
 	XMFLOAT3 Pos;
 	XMFLOAT4 Color;
+};
 
+struct TexturedVertex {
+	TexturedVertex() {};
+	TexturedVertex(float x, float y, float z, float tx, float ty) :
+		Pos(x, y, z),
+		TexC(tx, ty) {}
+
+	XMFLOAT3 Pos;
 	XMFLOAT2 TexC;
-	int hasTexture; //0 NO TEXTURE;  
 };
 
 struct Texture {
@@ -54,6 +53,7 @@ struct DrawItemProperties {
 
 struct GeometryData {
 	std::vector<Vertex> vertices;
+	std::vector<TexturedVertex> texVertices;
 	std::vector<std::uint16_t> indices;
 
 	ComPtr<ID3D12Resource> VertexBufferGPU = nullptr;

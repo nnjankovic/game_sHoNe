@@ -39,7 +39,7 @@ bool BoxDrawItem::loadGeometry()
 	float h = 0.5*m_height;
 	float d = 0.5*m_depth;
 
-	m_geometry.vertices =
+	std::vector<Vertex> vertices =
 	{
 		Vertex({ XMFLOAT3(m_properties.position.x - w,
 						  m_properties.position.y - h, 
@@ -81,7 +81,8 @@ bool BoxDrawItem::loadGeometry()
 						  m_properties.position.z + d), 
 						  XMFLOAT4(Colors::Salmon) })
 	};
-	m_geometry.VertexBufferSize = static_cast<UINT>(m_geometry.vertices.size()) * sizeof(Vertex);
+	m_geometry.vertices = vertices;//.data();
+	m_geometry.VertexBufferSize = static_cast<UINT>(vertices.size()) * sizeof(Vertex);
 	m_geometry.VertexByteStride = sizeof(Vertex);
 
 	m_geometry.indices =
