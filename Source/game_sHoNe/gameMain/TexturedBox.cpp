@@ -14,6 +14,8 @@ TexturedBox::TexturedBox(std::shared_ptr<IRenderer> renderer, float x, float y, 
 	m_properties.texture = tex;
 
 	m_properties.isTextured = true;
+
+	m_properties.xAngle = 30;
 }
 
 

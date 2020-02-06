@@ -45,6 +45,7 @@ struct DrawItemProperties {
 
 	ObjectConstants objectConstants;
 	MathHelper::PositionVector position;
+	float xAngle = 0;
 
 	Texture texture;
 

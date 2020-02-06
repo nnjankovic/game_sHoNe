@@ -42,9 +42,14 @@ void Scene::Init()
 	texBox2->create();
 	m_Items.push_back(texBox2);
 
-	auto plane = std::make_shared<PlaneDrawItem>(m_renderer);
+	auto plane = std::make_shared<PlaneDrawItem>(m_renderer, MathHelper::PositionVector{0,0,0}, 0);
 	plane->create();
 	m_Items.push_back(plane);
+
+	auto plane1 = std::make_shared<PlaneDrawItem>(m_renderer, MathHelper::PositionVector{ 60, 0, 0 }, 90);
+	plane1->create();
+	m_Items.push_back(plane1);
+
 
 	m_renderer->UploadStaticGeometry(m_Items);
 

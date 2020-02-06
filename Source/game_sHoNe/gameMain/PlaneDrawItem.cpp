@@ -2,12 +2,10 @@
 
 
 
-PlaneDrawItem::PlaneDrawItem(std::shared_ptr<IRenderer> renderer) : DrawItem(renderer)
+PlaneDrawItem::PlaneDrawItem(std::shared_ptr<IRenderer> renderer, MathHelper::PositionVector position, float angle) : 
+	DrawItem(renderer)
 {
-	//TODO: temporarly here remove hardcoded values from constructor
-	m_properties.position.x = 0;
-	m_properties.position.y = 0;
-	m_properties.position.z = 0;
+	m_properties.position = position;
 }
 
 
@@ -42,9 +40,9 @@ bool PlaneDrawItem::loadGeometry()
 	for (int i = 0; i<n; i++)
 		for (int j = 0; j < m; j++)
 		{
-			float z = (n - 1) / 2 - i;
-			float y = 0;
-			float x = j - (m - 1) / 2;
+			float z = m_properties.position.z + (n - 1) / 2 - i;
+			float y = m_properties.position.y + 0;
+			float x = m_properties.position.x + j - (m - 1) / 2;
 
 			XMFLOAT4 color;
 
