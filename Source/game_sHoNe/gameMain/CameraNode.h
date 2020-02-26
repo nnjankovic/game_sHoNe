@@ -32,6 +32,6 @@ private:
 
 	std::mutex m_mutex;
 
-	bool m_ViewDirty = false;
+	bool m_ViewDirty = true;
 };
 

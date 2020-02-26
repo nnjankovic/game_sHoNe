@@ -2,6 +2,7 @@
 
 #include "PlaneDrawItem.h"
 #include "TexturedBox.h"
+#include "TexturedPlane.h"
 
 Scene::Scene(HINSTANCE hInstance, std::shared_ptr<UserControllerListener> userControlListener, std::shared_ptr<GameTimer> timer) : 
 	m_hInstance(hInstance),
@@ -34,32 +35,23 @@ void Scene::Init()
 	box4->create();
 	m_Items.push_back(box4);
 
-	auto texBox1 = std::make_shared<TexturedBox>(m_renderer, -5, 6, 5, 2, 2, 2, m_textures[L"woodCrate"]);
+	/*auto texBox1 = std::make_shared<TexturedBox>(m_renderer, -5, 6, 5, 2, 2, 2, m_textures[L"woodCrate"]);
 	texBox1->create();
 	m_Items.push_back(texBox1);
 
 	auto texBox2 = std::make_shared<TexturedBox>(m_renderer, 0, 0, 15, 10, 10, 10, m_textures[L"woodCrate"]);
 	texBox2->create();
-	m_Items.push_back(texBox2);
+	m_Items.push_back(texBox2);*/
 
-	auto plane = std::make_shared<PlaneDrawItem>(m_renderer, MathHelper::PositionVector{0,0,0}, 0);
+	/*auto plane = std::make_shared<PlaneDrawItem>(m_renderer, MathHelper::PositionVector{0,0,0}, 0);
 	plane->create();
-	m_Items.push_back(plane);
+	m_Items.push_back(plane);*/
 
-	auto plane1 = std::make_shared<PlaneDrawItem>(m_renderer, MathHelper::PositionVector{ 60, 0, 0 }, 90);
-	plane1->create();
-	m_Items.push_back(plane1);
-
+	auto texturedPlane = std::make_shared<TexturedPlane>(m_renderer, MathHelper::PositionVector{ 0,0,0 }, 0, m_textures[L"checkboard"]);
+	texturedPlane->create();
+	m_Items.push_back(texturedPlane);
 
 	m_renderer->UploadStaticGeometry(m_Items);
-
-	/*//For now this is hard coded will change when I add camera object and automatically update camera
-	XMVECTOR pos = XMVectorSet(2.5f, 3.535f, 2.5f, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&m_viewMatrix, view);*/
 }
 
 
@@ -79,12 +71,15 @@ Scene::~Scene()
 
 void Scene::UploadTextures()
 {
-	Texture woodCrateTexture;
+	/*Texture woodCrateTexture;
 	woodCrateTexture.name = L"woodCrate";
 	woodCrateTexture.fileName = L"..\\..\\..\\Assets\\Textures\\WoodCrate01.dds";
-
 	m_renderer->UploadTexture(woodCrateTexture);
+	m_textures[woodCrateTexture.name] = woodCrateTexture;*/
 
-	m_textures[woodCrateTexture.name] = woodCrateTexture;
-
+	Texture checkboardTexture;
+	checkboardTexture.name = L"checkboard";
+	checkboardTexture.fileName = L"..\\..\\..\\Assets\\Textures\\checkboard.dds";
+	m_renderer->UploadTexture(checkboardTexture);
+	m_textures[checkboardTexture.name] = checkboardTexture;
 }

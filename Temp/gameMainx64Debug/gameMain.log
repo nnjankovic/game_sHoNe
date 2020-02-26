@@ -1,5 +1,3 @@
-﻿  TexturedBox.cpp
-c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\gamemain\texturedbox.cpp(43): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\gamemain\texturedbox.cpp(44): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\gamemain\texturedbox.cpp(45): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+﻿  TexturedPlane.cpp
+c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\gamemain\texturedplane.cpp(40): warning C4101: 'color': unreferenced local variable
   gameMain.vcxproj -> C:\Users\nenad.n.jankovic\Documents\GitHub\game_sHoNe\Source\game_sHoNe\gameMain\..\..\..\Test\x64Debug\gameMainx64Debug.exe
