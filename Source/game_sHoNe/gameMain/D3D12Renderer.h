@@ -28,6 +28,8 @@ public:
 	void Present() override;
 	void createPSO(DrawItem& drawItem) override;
 
+	void setWindowTitle(std::wstring title) override;
+
 	LRESULT CALLBACK windowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	std::vector<CD3DX12_STATIC_SAMPLER_DESC> GetStaticSamplers();
@@ -93,6 +95,8 @@ private:
 	int m_screenHeight;
 	D3D12_VIEWPORT m_viewPort;
 	D3D12_RECT m_scissorRect;
+
+	int m_textureCount;
 
 	bool m_isResizing = false;
 

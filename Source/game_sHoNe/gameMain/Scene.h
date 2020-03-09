@@ -16,6 +16,8 @@ public:
 	void Init();
 	void Exit() {};
 
+	void setFpsOnWindow(std::wstring fps);
+
 	void Draw();
 
 	~Scene();

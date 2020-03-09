@@ -20,6 +20,8 @@ struct IRenderer {
 	virtual void Present() = 0;
 	virtual void createPSO(DrawItem& drawItem) = 0;
 
+	virtual void setWindowTitle(std::wstring title) = 0;
+
 	virtual ~IRenderer() {};
 };
 

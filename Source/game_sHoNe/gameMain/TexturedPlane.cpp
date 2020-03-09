@@ -5,6 +5,7 @@ TexturedPlane::TexturedPlane(std::shared_ptr<IRenderer> renderer, MathHelper::Po
 {
 	m_properties.position = position;
 	m_properties.isTextured = true;
+	m_properties.texture = tex;
 }
 
 bool TexturedPlane::createShadersAndInputLayout()

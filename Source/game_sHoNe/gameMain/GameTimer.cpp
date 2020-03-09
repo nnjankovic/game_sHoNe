@@ -25,7 +25,7 @@ double GameTimer::GameTime() const {
 
 	auto endTime = m_isPaused ? m_lastPauseTime : m_currentTime;
 
-	return (endTime - m_startTime) / m_timerFrequency - m_totalPauseTime / m_timerFrequency;
+	return (endTime - m_startTime) / m_timerFrequency;//- m_totalPauseTime / m_timerFrequency;
 }
 
 void GameTimer::Tick(){

@@ -19,7 +19,7 @@ void Scene::Init()
 
 	UploadTextures();
 
-	auto box1 = std::make_shared<BoxDrawItem>(m_renderer, 0, 5, 0);
+	/*auto box1 = std::make_shared<BoxDrawItem>(m_renderer, 0, 5, 0);
 	box1->create();
 	m_Items.push_back(box1);
 
@@ -33,15 +33,15 @@ void Scene::Init()
 
 	auto box4 = std::make_shared<BoxDrawItem>(m_renderer, -5, 6, 0, 2, 2, 2);
 	box4->create();
-	m_Items.push_back(box4);
+	m_Items.push_back(box4);*/
 
-	/*auto texBox1 = std::make_shared<TexturedBox>(m_renderer, -5, 6, 5, 2, 2, 2, m_textures[L"woodCrate"]);
+	auto texBox1 = std::make_shared<TexturedBox>(m_renderer, -5, 6, 5, 2, 2, 2, m_textures[L"woodCrate"]);
 	texBox1->create();
 	m_Items.push_back(texBox1);
 
 	auto texBox2 = std::make_shared<TexturedBox>(m_renderer, 0, 0, 15, 10, 10, 10, m_textures[L"woodCrate"]);
 	texBox2->create();
-	m_Items.push_back(texBox2);*/
+	m_Items.push_back(texBox2);
 
 	/*auto plane = std::make_shared<PlaneDrawItem>(m_renderer, MathHelper::PositionVector{0,0,0}, 0);
 	plane->create();
@@ -54,6 +54,11 @@ void Scene::Init()
 	m_renderer->UploadStaticGeometry(m_Items);
 }
 
+
+void Scene::setFpsOnWindow(std::wstring fps)
+{
+	m_renderer->setWindowTitle(fps);
+}
 
 void Scene::Draw()
 {
@@ -71,11 +76,11 @@ Scene::~Scene()
 
 void Scene::UploadTextures()
 {
-	/*Texture woodCrateTexture;
+	Texture woodCrateTexture;
 	woodCrateTexture.name = L"woodCrate";
 	woodCrateTexture.fileName = L"..\\..\\..\\Assets\\Textures\\WoodCrate01.dds";
 	m_renderer->UploadTexture(woodCrateTexture);
-	m_textures[woodCrateTexture.name] = woodCrateTexture;*/
+	m_textures[woodCrateTexture.name] = woodCrateTexture;
 
 	Texture checkboardTexture;
 	checkboardTexture.name = L"checkboard";

@@ -25,7 +25,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 D3D12Renderer::D3D12Renderer(HINSTANCE hInstance) :
 	m_hInstance(hInstance),
 	m_screenHeight(800),
-	m_screenWidth(1024)
+	m_screenWidth(1024),
+	m_textureCount(0)
 {
 
 }
@@ -149,7 +150,9 @@ bool D3D12Renderer::Draw(DrawItem & drawItem)
 	m_d3dCommandList->SetGraphicsRootConstantBufferView(0, m_ObjectConstantBuffer->Resource()->GetGPUVirtualAddress());
 
 	if (drawItem.m_properties.isTextured) {
-		m_d3dCommandList->SetGraphicsRootDescriptorTable(1, m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+		CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+		tex.Offset(drawItem.m_properties.texture.index, m_CrvSrvUrvDescriptorSize);
+		m_d3dCommandList->SetGraphicsRootDescriptorTable(1, tex);
 	}
 
 	m_d3dCommandList->DrawIndexedInstanced(drawItem.m_geometry.indices.size(), 1, 0, 0, 0);
@@ -199,6 +202,11 @@ bool D3D12Renderer::UploadTexture(Texture & texture)
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = texture.Resource->GetDesc().MipLevels;
 	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+	hDescriptor.Offset(m_textureCount, m_CrvSrvUrvDescriptorSize);
+	texture.index = m_textureCount;
+	m_textureCount++;
+
 	m_d3dDevice->CreateShaderResourceView(texture.Resource.Get(), &srvDesc, hDescriptor);
 
 	return true;
@@ -252,6 +260,11 @@ void D3D12Renderer::createPSO(DrawItem & drawItem)
 	psoDesc.SampleDesc.Quality = m_4xMsaaState ? (m_4xMsaaQuality - 1) : 0;
 	psoDesc.DSVFormat = m_depthStencilFormat;
 	HRESULT hr = m_d3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&drawItem.m_properties.pipelineStateObject));
+}
+
+void D3D12Renderer::setWindowTitle(std::wstring title)
+{
+	SetWindowText(m_window, title.c_str());
 }
 
 bool D3D12Renderer::InitD3D() {
