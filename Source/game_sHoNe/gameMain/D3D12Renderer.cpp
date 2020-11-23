@@ -613,7 +613,7 @@ LRESULT  D3D12Renderer::windowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 
 	case WM_EXITSIZEMOVE:
 		m_isResizing = false;
-		//OnResize();
+		OnResize();
 		break;
 
 	case WM_DESTROY:

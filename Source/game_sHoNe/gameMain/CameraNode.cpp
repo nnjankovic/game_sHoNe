@@ -79,27 +79,27 @@ void CameraNode::OnUserButtonPressed(std::wstring button)
 {
 	if (button == L"W")
 	{
-		Walk(333 * m_timer->DeltaTime());
+		Walk(555 * m_timer->DeltaTime());
 	}
 	else if (button == L"S")
 	{
-		Walk(-333 * m_timer->DeltaTime());
+		Walk(-555 * m_timer->DeltaTime());
 	}
 	else if (button == L"A")
 	{
-		Strafe(-333 * m_timer->DeltaTime());
+		Strafe(-555 * m_timer->DeltaTime());
 	}
 	else if (button == L"D")
 	{
-		Strafe(333 * m_timer->DeltaTime());
+		Strafe(555 * m_timer->DeltaTime());
 	}
 	else if (button == L"Q")
 	{
-		RotateH(-40 * m_timer->DeltaTime());
+		RotateH(-77 * m_timer->DeltaTime());
 	}
 	else if (button == L"E")
 	{
-		RotateH(40 * m_timer->DeltaTime());
+		RotateH(77 * m_timer->DeltaTime());
 	}
 
 }
