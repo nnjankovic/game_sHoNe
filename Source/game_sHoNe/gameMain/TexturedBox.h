@@ -8,7 +8,7 @@ public:
 	~TexturedBox();
 
 	// Inherited via DrawItem
-	virtual bool createShadersAndInputLayout() override;
+	//virtual bool createShadersAndInputLayout() override;
 	virtual bool loadGeometry() override;
 
 private:

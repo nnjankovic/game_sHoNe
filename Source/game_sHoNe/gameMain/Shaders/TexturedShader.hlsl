@@ -1,10 +1,17 @@
 
 Texture2D    gTexture : register(t0);
-SamplerState gSampler : register(s0);
+
+SamplerState gsamPointWrap        : register(s0);
+SamplerState gsamPointClamp       : register(s1);
+SamplerState gsamLinearWrap       : register(s2);
+SamplerState gsamLinearClamp      : register(s3);
+SamplerState gsamAnisotropicWrap  : register(s4);
+SamplerState gsamAnisotropicClamp : register(s5);
 
 cbuffer cbPerObject : register(b0)
 {
 	float4x4 gWorldViewProj;
+	float4x4 gTexTransform;
 };
 
 struct VertexIn
@@ -26,13 +33,13 @@ VertexOut VS(VertexIn vin)
 	// Transform to homogeneous clip space.
 	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
 
-	// Just pass vertex color into the pixel shader.
-	vout.TexC = vin.TexC;
+	// Transform texture.
+	vout.TexC = mul(float4(vin.TexC, 0.0f, 1.0f), gTexTransform).xy;
 
 	return vout;
 }
 
 float4 PS(VertexOut pin) : SV_Target
 {
-	return gTexture.Sample(gSampler, pin.TexC);
+	return gTexture.Sample(gsamAnisotropicWrap, pin.TexC);
 }

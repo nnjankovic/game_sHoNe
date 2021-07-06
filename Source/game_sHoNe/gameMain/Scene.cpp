@@ -35,12 +35,14 @@ void Scene::Init()
 	box4->create();
 	m_Items.push_back(box4);*/
 
-	auto texBox1 = std::make_shared<TexturedBox>(m_renderer, -5, 6, 5, 2, 2, 2, m_textures[L"woodCrate"]);
+	auto texBox1 = std::make_shared<TexturedBox>(m_renderer, -5, 0, 1, 2, 2, 2, m_textures[L"woodCrate"]);
 	texBox1->create();
+	texBox1->setConstantBufferIndex(0);
 	m_Items.push_back(texBox1);
 
-	auto texBox2 = std::make_shared<TexturedBox>(m_renderer, 0, 0, 15, 10, 10, 10, m_textures[L"woodCrate"]);
+	auto texBox2 = std::make_shared<TexturedBox>(m_renderer, 0, 0, 2.5, 5, 5, 5, m_textures[L"woodCrate"]);
 	texBox2->create();
+	texBox2->setConstantBufferIndex(1);
 	m_Items.push_back(texBox2);
 
 	/*auto plane = std::make_shared<PlaneDrawItem>(m_renderer, MathHelper::PositionVector{0,0,0}, 0);
@@ -49,6 +51,7 @@ void Scene::Init()
 
 	auto texturedPlane = std::make_shared<TexturedPlane>(m_renderer, MathHelper::PositionVector{ 0,0,0 }, 0, m_textures[L"checkboard"]);
 	texturedPlane->create();
+	texturedPlane->setConstantBufferIndex(2);
 	m_Items.push_back(texturedPlane);
 
 	m_renderer->UploadStaticGeometry(m_Items);

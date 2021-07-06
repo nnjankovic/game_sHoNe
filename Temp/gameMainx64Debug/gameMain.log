@@ -1,4 +1,23 @@
-﻿  D3D12Renderer.cpp
-c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\gamemain\d3d12renderer.cpp(158): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\gamemain\d3d12renderer.cpp(583): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+﻿  Scene.cpp
+c:\program files (x86)\microsoft visual studio\2017\professional\vc\tools\msvc\14.16.27023\include\memory(1801): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\professional\vc\tools\msvc\14.16.27023\include\memory(1866): note: see reference to function template instantiation 'std::_Ref_count_obj<_Ty>::_Ref_count_obj<std::shared_ptr<IRenderer>&,int,int,int,int,int,int,Texture&>(std::shared_ptr<IRenderer> &,int &&,int &&,int &&,int &&,int &&,int &&,Texture &)' being compiled
+          with
+          [
+              _Ty=TexturedBox
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\professional\vc\tools\msvc\14.16.27023\include\memory(1866): note: see reference to function template instantiation 'std::_Ref_count_obj<_Ty>::_Ref_count_obj<std::shared_ptr<IRenderer>&,int,int,int,int,int,int,Texture&>(std::shared_ptr<IRenderer> &,int &&,int &&,int &&,int &&,int &&,int &&,Texture &)' being compiled
+          with
+          [
+              _Ty=TexturedBox
+          ]
+  c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\gamemain\scene.cpp(38): note: see reference to function template instantiation 'std::shared_ptr<TexturedBox> std::make_shared<TexturedBox,std::shared_ptr<IRenderer>&,int,int,int,int,int,int,Texture&>(std::shared_ptr<IRenderer> &,int &&,int &&,int &&,int &&,int &&,int &&,Texture &)' being compiled
+c:\program files (x86)\microsoft visual studio\2017\professional\vc\tools\msvc\14.16.27023\include\memory(1801): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
+          with
+          [
+              _Ty=double
+          ]
   gameMain.vcxproj -> C:\Users\nenad.n.jankovic\Documents\GitHub\game_sHoNe\Source\game_sHoNe\gameMain\..\..\..\Test\x64Debug\gameMainx64Debug.exe

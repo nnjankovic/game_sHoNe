@@ -11,7 +11,7 @@ public:
 
 private:
 	// Inherited via DrawItem
-	bool createShadersAndInputLayout() override;
+	//bool createShadersAndInputLayout() override;
 	bool loadGeometry() override;
 
 private:

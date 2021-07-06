@@ -39,11 +39,10 @@ struct Texture {
 };
 
 struct DrawItemProperties {
-	ComPtr<ID3DBlob> vertexShaderByteCode;
-	ComPtr<ID3DBlob> pixelShaderByteCode;
-	ComPtr<ID3D12PipelineState> pipelineStateObject;
-
-	std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout;
+	//ComPtr<ID3DBlob> vertexShaderByteCode;
+	//ComPtr<ID3DBlob> pixelShaderByteCode;
+	//ComPtr<ID3D12PipelineState> pipelineStateObject;
+	//std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout;
 
 	ObjectConstants objectConstants;
 	MathHelper::PositionVector position;
@@ -51,7 +50,10 @@ struct DrawItemProperties {
 
 	Texture texture;
 
-	bool isTextured = false;
+	ShaderType shaderType = ShaderType::PLAIN;
+
+	unsigned int constantBufferIndex = 0;
+	//bool isTextured = false;
 };
 
 struct GeometryData {
@@ -99,17 +101,19 @@ public:
 	virtual ~DrawItem() {};
 
 	virtual void create() {
-		createShadersAndInputLayout();
+		//createShadersAndInputLayout();
 		loadGeometry();
-		m_renderer->createPSO(*this);
+		//m_renderer->createPSO(*this);
 	}
+
+	void setConstantBufferIndex(unsigned int index) { m_properties.constantBufferIndex = index; }
 
 	virtual void Draw(XMMATRIX matrixStack);
 
 	virtual void Update(const GameTimer& gt) {}
 
 protected:
-	virtual bool createShadersAndInputLayout() = 0;
+	//virtual bool createShadersAndInputLayout() = 0;
 	virtual bool loadGeometry() = 0;
 	virtual bool loadTexture() { return false; }
 

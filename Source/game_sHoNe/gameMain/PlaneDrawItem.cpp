@@ -13,21 +13,6 @@ PlaneDrawItem::~PlaneDrawItem()
 {
 }
 
-
-bool PlaneDrawItem::createShadersAndInputLayout()
-{
-	m_properties.vertexShaderByteCode = CompileShader(L"Shaders\\Shader.hlsl", nullptr, "VS", "vs_5_0");
-	m_properties.pixelShaderByteCode = CompileShader(L"Shaders\\Shader.hlsl", nullptr, "PS", "ps_5_0");
-
-	m_properties.inputLayout =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-	};
-
-	return true;
-}
-
 bool PlaneDrawItem::loadGeometry()
 {
 	int n = 50;

@@ -5,6 +5,8 @@
 #include "IRenderer.h"
 #include "Utility.h"
 
+#include <map>
+
 using namespace Microsoft::WRL;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -12,7 +14,17 @@ using namespace DirectX::PackedVector;
 struct ObjectConstants
 {
 	XMFLOAT4X4 WorldViewProj = MathHelper::Identity4x4();
+	XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
 };
+
+struct shadersAndPSO {
+	ComPtr<ID3DBlob> vertexShaderByteCode;
+	ComPtr<ID3DBlob> pixelShaderByteCode;
+	ComPtr<ID3D12PipelineState> pipelineStateObject;
+	std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout;
+};
+
+
 
 class D3D12Renderer : public IRenderer {
 public:
@@ -26,7 +38,7 @@ public:
 	bool UploadStaticGeometry(std::vector<std::shared_ptr<DrawItem>> staticDrawItems) override;
 	bool UploadTexture(Texture& texture) override;
 	void Present() override;
-	void createPSO(DrawItem& drawItem) override;
+	//void createPSO(DrawItem& drawItem) override;
 
 	void setWindowTitle(std::wstring title) override;
 
@@ -50,6 +62,9 @@ private:
 
 	void FlushCommandQueue();
 	void OnResize();
+
+	void CreateShadersAndInputLayout();
+	void createPSO(shadersAndPSO& shader);
 private:
 	ComPtr<IDXGIFactory4> m_dxgiFactory;
 	ComPtr<ID3D12Device>  m_d3dDevice;
@@ -100,11 +115,13 @@ private:
 
 	bool m_isResizing = false;
 
-	std::unique_ptr<uplooad_helper<ObjectConstants>> m_ObjectConstantBuffer;
+	std::unique_ptr<upload_helper<ObjectConstants>> m_ObjectConstantBuffer;
 
 	XMFLOAT4X4 m_projectionMatrix = MathHelper::Identity4x4();
 	
 	//Depends on height/width ratio (screen size) used to project 3d vertices to 2d screen space
+
+	std::map<ShaderType, shadersAndPSO> m_shaders;
 };
 
 #endif

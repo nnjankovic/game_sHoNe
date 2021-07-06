@@ -9,6 +9,11 @@ struct Texture;
 #include <vector>
 #include <Windows.h>
 
+enum class ShaderType {
+	PLAIN,
+	TEXTURED
+};
+
 struct IRenderer {
 	virtual bool Init() = 0;
 	virtual bool Exit() = 0;
@@ -18,7 +23,7 @@ struct IRenderer {
 	virtual bool UploadStaticGeometry(std::vector<std::shared_ptr<DrawItem>> staticDrawItems) = 0;
 	virtual bool UploadTexture(Texture& texture) = 0;
 	virtual void Present() = 0;
-	virtual void createPSO(DrawItem& drawItem) = 0;
+	//virtual void createPSO(DrawItem& drawItem) = 0;
 
 	virtual void setWindowTitle(std::wstring title) = 0;
 

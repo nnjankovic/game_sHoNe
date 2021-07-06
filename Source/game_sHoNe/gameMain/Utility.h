@@ -66,9 +66,9 @@ ComPtr<ID3DBlob> CompileShader(
 	const std::string& target);
 
 template<typename T>
-class uplooad_helper {
+class upload_helper {
 public:
-	uplooad_helper(ID3D12Device* device, UINT elementCount, bool isConstantBuffer) {
+	upload_helper(ID3D12Device* device, UINT elementCount, bool isConstantBuffer) : m_elementCount(elementCount) {
 		if (!isConstantBuffer)
 			m_elementSize = sizeof(T);
 		else
@@ -88,9 +88,8 @@ public:
 		assert(!(FAILED(hr)));
 	}
 
-	void setData(const T& data) {
-		//TODO: maps data from the start only - probably need to change in the future
-		int index = 0;
+	void setData(const T& data, unsigned int index = 0) {
+		assert(index < m_elementCount);
 		memcpy(&m_MappedData[index*m_elementSize], &data, sizeof(T));
 	}
 
@@ -101,10 +100,17 @@ public:
 	UINT getElementSize() {
 		return m_elementSize;
 	}
+
+	~upload_helper() {
+		if (m_uploadBuffer != nullptr)
+			m_uploadBuffer->Unmap(0, nullptr);
+		m_MappedData = nullptr;
+	}
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_uploadBuffer;
 	BYTE* m_MappedData = nullptr;
 
+	unsigned int m_elementCount;
 	uint16_t m_elementSize;
 };
 

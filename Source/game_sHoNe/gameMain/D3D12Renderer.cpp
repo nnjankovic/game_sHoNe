@@ -126,13 +126,13 @@ bool D3D12Renderer::Draw(DrawItem & drawItem)
 
 	transformMatrix *= proj;
 
-	ObjectConstants bla;
+	ObjectConstants bla = drawItem.m_properties.objectConstants;
 
 	XMStoreFloat4x4(&bla.WorldViewProj, XMMatrixTranspose(transformMatrix));
 
-	m_ObjectConstantBuffer->setData(bla);
+	m_ObjectConstantBuffer->setData(bla, drawItem.m_properties.constantBufferIndex);
 
-	ID3D12DescriptorHeap* descriptorHeaps[] = { m_SrvDescriptorHeap.Get()/*, m_SrvDescriptorHeap.Get()*/};
+	ID3D12DescriptorHeap* descriptorHeaps[] = { m_SrvDescriptorHeap.Get() };
 	m_d3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 	//ID3D12DescriptorHeap* descriptorHeaps1[] = { m_SrvDescriptorHeap.Get() };
@@ -140,16 +140,18 @@ bool D3D12Renderer::Draw(DrawItem & drawItem)
 
 	m_d3dCommandList->SetGraphicsRootSignature(m_RootSignature.Get());
 
-	m_d3dCommandList->SetPipelineState(drawItem.m_properties.pipelineStateObject.Get());
+	m_d3dCommandList->SetPipelineState(m_shaders[drawItem.m_properties.shaderType].pipelineStateObject.Get());
 
 	m_d3dCommandList->IASetVertexBuffers(0, 1, &drawItem.m_geometry.VertexBufferView());
 	m_d3dCommandList->IASetIndexBuffer(&drawItem.m_geometry.IndexBufferView());
 	m_d3dCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	//m_d3dCommandList->SetGraphicsRootDescriptorTable(0, m_CbvHeap->GetGPUDescriptorHandleForHeapStart());
-	m_d3dCommandList->SetGraphicsRootConstantBufferView(0, m_ObjectConstantBuffer->Resource()->GetGPUVirtualAddress());
 
-	if (drawItem.m_properties.isTextured) {
+	D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_ObjectConstantBuffer->Resource()->GetGPUVirtualAddress() + drawItem.m_properties.constantBufferIndex*m_ObjectConstantBuffer->getElementSize();
+	m_d3dCommandList->SetGraphicsRootConstantBufferView(0, objCBAddress);
+
+	if (drawItem.m_properties.shaderType == ShaderType::TEXTURED) {
 		CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 		tex.Offset(drawItem.m_properties.texture.index, m_CrvSrvUrvDescriptorSize);
 		m_d3dCommandList->SetGraphicsRootDescriptorTable(1, tex);
@@ -164,7 +166,7 @@ bool D3D12Renderer::UploadStaticGeometry(std::vector<std::shared_ptr<DrawItem>> 
 {
 	for (auto& drawItem : staticDrawItems)
 	{
-		if(drawItem->m_properties.isTextured)
+		if(drawItem->m_properties.shaderType == ShaderType::TEXTURED)
 			drawItem->m_geometry.VertexBufferGPU = CreateDefaultBuffer(m_d3dDevice.Get(), m_d3dCommandList.Get(), drawItem->m_geometry.texVertices.data(),
 				drawItem->m_geometry.VertexBufferSize, drawItem->m_geometry.VertexBufferUploader);
 		else
@@ -232,21 +234,21 @@ void D3D12Renderer::Present()
 
 }
 
-void D3D12Renderer::createPSO(DrawItem & drawItem)
+void D3D12Renderer::createPSO(shadersAndPSO& shader)
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 	ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-	psoDesc.InputLayout = { drawItem.m_properties.inputLayout.data(), (UINT)drawItem.m_properties.inputLayout.size() };
+	psoDesc.InputLayout = { shader.inputLayout.data(), (UINT)shader.inputLayout.size() };
 	psoDesc.pRootSignature = m_RootSignature.Get();
 	psoDesc.VS =
 	{
-		reinterpret_cast<BYTE*>(drawItem.m_properties.vertexShaderByteCode->GetBufferPointer()),
-		drawItem.m_properties.vertexShaderByteCode->GetBufferSize()
+		reinterpret_cast<BYTE*>(shader.vertexShaderByteCode->GetBufferPointer()),
+		shader.vertexShaderByteCode->GetBufferSize()
 	};
 	psoDesc.PS =
 	{
-		reinterpret_cast<BYTE*>(drawItem.m_properties.pixelShaderByteCode->GetBufferPointer()),
-		drawItem.m_properties.pixelShaderByteCode->GetBufferSize()
+		reinterpret_cast<BYTE*>(shader.pixelShaderByteCode->GetBufferPointer()),
+		shader.pixelShaderByteCode->GetBufferSize()
 	};
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	//psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
@@ -259,7 +261,7 @@ void D3D12Renderer::createPSO(DrawItem & drawItem)
 	psoDesc.SampleDesc.Count = m_4xMsaaState ? 4 : 1;
 	psoDesc.SampleDesc.Quality = m_4xMsaaState ? (m_4xMsaaQuality - 1) : 0;
 	psoDesc.DSVFormat = m_depthStencilFormat;
-	HRESULT hr = m_d3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&drawItem.m_properties.pipelineStateObject));
+	HRESULT hr = m_d3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&shader.pipelineStateObject));
 }
 
 void D3D12Renderer::setWindowTitle(std::wstring title)
@@ -308,6 +310,8 @@ bool D3D12Renderer::InitD3D() {
 	CreateDescriptorHeaps();
 	CreateConstantBuffers();
 	CreateRootSignature();
+
+	CreateShadersAndInputLayout();
 
 	return true;
 }
@@ -461,7 +465,9 @@ void D3D12Renderer::CreateDSViewAndBuffer() {
 
 void D3D12Renderer::CreateConstantBuffers()
 {
-	m_ObjectConstantBuffer = std::make_unique<uplooad_helper<ObjectConstants>>(m_d3dDevice.Get(), 1, true);
+	//create enough space for 10 render items
+	// think how it would be possible to make this dynamic
+	m_ObjectConstantBuffer = std::make_unique<upload_helper<ObjectConstants>>(m_d3dDevice.Get(), 10, true);
 
 	/*D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 	cbvDesc.BufferLocation = m_ObjectConstantBuffer->Resource()->GetGPUVirtualAddress();
@@ -582,6 +588,31 @@ void D3D12Renderer::OnResize() {
 
 	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f*XM_PI, m_screenWidth / m_screenHeight, 1.0f, 1000.0f);
 	XMStoreFloat4x4(&m_projectionMatrix, P);
+}
+
+void D3D12Renderer::CreateShadersAndInputLayout()
+{
+	shadersAndPSO normalShader;
+	normalShader.vertexShaderByteCode = CompileShader(L"Shaders\\Shader.hlsl", nullptr, "VS", "vs_5_0");
+	normalShader.pixelShaderByteCode = CompileShader(L"Shaders\\Shader.hlsl", nullptr, "PS", "ps_5_0");
+	normalShader.inputLayout =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+	};
+	createPSO(normalShader);
+	m_shaders[ShaderType::PLAIN] = normalShader;
+
+	shadersAndPSO texturedShader;
+	texturedShader.vertexShaderByteCode = CompileShader(L"Shaders\\TexturedShader.hlsl", nullptr, "VS", "vs_5_0");
+	texturedShader.pixelShaderByteCode = CompileShader(L"Shaders\\TexturedShader.hlsl", nullptr, "PS", "ps_5_0");
+	texturedShader.inputLayout =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TEX", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+	};
+	createPSO(texturedShader);
+	m_shaders[ShaderType::TEXTURED] = texturedShader;
 }
 
 LRESULT  D3D12Renderer::windowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {

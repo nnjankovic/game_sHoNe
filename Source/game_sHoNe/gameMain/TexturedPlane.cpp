@@ -4,23 +4,10 @@ TexturedPlane::TexturedPlane(std::shared_ptr<IRenderer> renderer, MathHelper::Po
 	DrawItem(renderer)
 {
 	m_properties.position = position;
-	m_properties.isTextured = true;
+	m_properties.shaderType = ShaderType::TEXTURED;
 	m_properties.texture = tex;
 }
 
-bool TexturedPlane::createShadersAndInputLayout()
-{
-	m_properties.vertexShaderByteCode = CompileShader(L"Shaders\\TexturedShader.hlsl", nullptr, "VS", "vs_5_0");
-	m_properties.pixelShaderByteCode = CompileShader(L"Shaders\\TexturedShader.hlsl", nullptr, "PS", "ps_5_0");
-
-	m_properties.inputLayout =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TEX", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-	};
-
-	return true;
-}
 
 bool TexturedPlane::loadGeometry()
 {
@@ -31,6 +18,9 @@ bool TexturedPlane::loadGeometry()
 
 	std::vector<TexturedVertex> vertices;
 
+	float du = 1.0f / (n - 1);
+	float dv = 1.0f / (m - 1);
+
 	for (float i = 0; i < n; i++)
 		for (float j = 0; j < m; j++)
 		{
@@ -40,8 +30,10 @@ bool TexturedPlane::loadGeometry()
 
 			XMFLOAT4 color;
 
-			float texX = (i/n)*7 <= 1.0001 ? (i / n) * 7 : (i / n) * 7 - 1;
-			float texY = ((j / m) * 7) <= 1.0001 ? ((j / m) * 7) : ((j / m) * 7) - 1;
+			//float texX = (i/n)*7 <= 1.0001 ? (i / n) * 7 : (i / n) * 7 - 1;
+			//float texY = ((j / m) * 7) <= 1.0001 ? ((j / m) * 7) : ((j / m) * 7) - 1;
+			float texX = i * du;
+			float texY = j * dv;
 
 			vertices.push_back(
 				TexturedVertex(x, y, z, texX, texY )
@@ -69,6 +61,9 @@ bool TexturedPlane::loadGeometry()
 	m_geometry.VertexBufferSize = static_cast<UINT>(vertices.size()) * sizeof(TexturedVertex);
 	m_geometry.VertexByteStride = sizeof(TexturedVertex);
 	m_geometry.IndexBufferSize = static_cast<uint16_t>(m_geometry.indices.size()) * sizeof(uint16_t);
+
+	XMStoreFloat4x4(&m_properties.objectConstants.TexTransform,
+		XMMatrixScaling(6.0f, 6.0f, 1.0f));
 
 	return true;
 }
