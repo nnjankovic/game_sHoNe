@@ -13,8 +13,14 @@ using namespace DirectX::PackedVector;
 
 struct ObjectConstants
 {
-	XMFLOAT4X4 WorldViewProj = MathHelper::Identity4x4();
+	XMFLOAT4X4 WorldMatrix = MathHelper::Identity4x4();
 	XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
+};
+
+struct CameraConstants
+{
+	XMFLOAT4X4 CameraViewMatrix = MathHelper::Identity4x4();
+	XMFLOAT4X4 ProjectionViewMatrix = MathHelper::Identity4x4();
 };
 
 struct shadersAndPSO {
@@ -38,6 +44,7 @@ public:
 	bool UploadStaticGeometry(std::vector<std::shared_ptr<DrawItem>> staticDrawItems) override;
 	bool UploadTexture(Texture& texture) override;
 	void Present() override;
+	void setCameraView(const XMFLOAT4X4& CameraViewMatrix) override;
 	//void createPSO(DrawItem& drawItem) override;
 
 	void setWindowTitle(std::wstring title) override;
@@ -116,6 +123,9 @@ private:
 	bool m_isResizing = false;
 
 	std::unique_ptr<upload_helper<ObjectConstants>> m_ObjectConstantBuffer;
+
+	CameraConstants m_CameraConstants;
+	std::unique_ptr<upload_helper<CameraConstants>> m_CameraConstantBuffer;
 
 	XMFLOAT4X4 m_projectionMatrix = MathHelper::Identity4x4();
 	

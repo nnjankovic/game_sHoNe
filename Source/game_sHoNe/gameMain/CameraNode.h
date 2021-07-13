@@ -11,6 +11,7 @@ public:
 	~CameraNode();
 
 	DirectX::XMFLOAT4X4 getViewMatrix();
+	bool isViewDirty();
 private:
 	// Inherited via IUserControlCallback
 	virtual void OnUserButtonPressed(std::wstring button) override;

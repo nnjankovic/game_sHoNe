@@ -102,11 +102,10 @@ public:
 
 	virtual void create() {
 		//createShadersAndInputLayout();
+		m_properties.constantBufferIndex = s_constantBuffer++;
 		loadGeometry();
 		//m_renderer->createPSO(*this);
 	}
-
-	void setConstantBufferIndex(unsigned int index) { m_properties.constantBufferIndex = index; }
 
 	virtual void Draw(XMMATRIX matrixStack);
 
@@ -123,6 +122,8 @@ protected:
 	DrawItemProperties m_properties;
 
 	std::shared_ptr<IRenderer> m_renderer;
+
+	static unsigned int s_constantBuffer;
 };
 
 #endif // !DRAWITEM_H_

@@ -8,6 +8,7 @@ struct Texture;
 #include <memory>
 #include <vector>
 #include <Windows.h>
+#include <DirectXMath.h>
 
 enum class ShaderType {
 	PLAIN,
@@ -26,6 +27,8 @@ struct IRenderer {
 	//virtual void createPSO(DrawItem& drawItem) = 0;
 
 	virtual void setWindowTitle(std::wstring title) = 0;
+
+	virtual void setCameraView(const DirectX::XMFLOAT4X4& CameraViewMatrix) = 0;
 
 	virtual ~IRenderer() {};
 };

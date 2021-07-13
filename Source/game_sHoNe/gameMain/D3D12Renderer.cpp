@@ -121,16 +121,19 @@ bool D3D12Renderer::PrepareDraw()
 
 bool D3D12Renderer::Draw(DrawItem & drawItem)
 {
-	XMMATRIX transformMatrix = XMLoadFloat4x4(&drawItem.m_properties.objectConstants.WorldViewProj);
+	/*XMMATRIX transformMatrix = XMLoadFloat4x4(&drawItem.m_properties.objectConstants.WorldMatrix);
 	XMMATRIX proj = XMLoadFloat4x4(&m_projectionMatrix);
 
 	transformMatrix *= proj;
 
 	ObjectConstants bla = drawItem.m_properties.objectConstants;
 
-	XMStoreFloat4x4(&bla.WorldViewProj, XMMatrixTranspose(transformMatrix));
+	XMStoreFloat4x4(&bla.WorldMatrix, XMMatrixTranspose(transformMatrix));
 
-	m_ObjectConstantBuffer->setData(bla, drawItem.m_properties.constantBufferIndex);
+	m_ObjectConstantBuffer->setData(bla, drawItem.m_properties.constantBufferIndex);*/
+	
+	m_ObjectConstantBuffer->setData(drawItem.m_properties.objectConstants, drawItem.m_properties.constantBufferIndex);
+	m_CameraConstantBuffer->setData(m_CameraConstants);
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = { m_SrvDescriptorHeap.Get() };
 	m_d3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
@@ -150,6 +153,9 @@ bool D3D12Renderer::Draw(DrawItem & drawItem)
 
 	D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_ObjectConstantBuffer->Resource()->GetGPUVirtualAddress() + drawItem.m_properties.constantBufferIndex*m_ObjectConstantBuffer->getElementSize();
 	m_d3dCommandList->SetGraphicsRootConstantBufferView(0, objCBAddress);
+
+	D3D12_GPU_VIRTUAL_ADDRESS cameraCBAddress = m_CameraConstantBuffer->Resource()->GetGPUVirtualAddress();
+	m_d3dCommandList->SetGraphicsRootConstantBufferView(2, cameraCBAddress);
 
 	if (drawItem.m_properties.shaderType == ShaderType::TEXTURED) {
 		CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
@@ -232,6 +238,11 @@ void D3D12Renderer::Present()
 
 	FlushCommandQueue();
 
+}
+
+void D3D12Renderer::setCameraView(const XMFLOAT4X4 & CameraViewMatrix)
+{
+	m_CameraConstants.CameraViewMatrix = CameraViewMatrix;
 }
 
 void D3D12Renderer::createPSO(shadersAndPSO& shader)
@@ -469,6 +480,8 @@ void D3D12Renderer::CreateConstantBuffers()
 	// think how it would be possible to make this dynamic
 	m_ObjectConstantBuffer = std::make_unique<upload_helper<ObjectConstants>>(m_d3dDevice.Get(), 10, true);
 
+	m_CameraConstantBuffer = std::make_unique<upload_helper<CameraConstants>>(m_d3dDevice.Get(), 1, true);
+
 	/*D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 	cbvDesc.BufferLocation = m_ObjectConstantBuffer->Resource()->GetGPUVirtualAddress();
 	cbvDesc.SizeInBytes = m_ObjectConstantBuffer->getElementSize();
@@ -481,7 +494,7 @@ void D3D12Renderer::CreateConstantBuffers()
 
 void D3D12Renderer::CreateRootSignature()
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[3];
 
 	//CD3DX12_DESCRIPTOR_RANGE cbvTable;
 	//cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
@@ -491,11 +504,12 @@ void D3D12Renderer::CreateRootSignature()
 
 	slotRootParameter[0].InitAsConstantBufferView(0);
 	slotRootParameter[1].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
+	slotRootParameter[2].InitAsConstantBufferView(1);
 
 	auto staticSamplers = GetStaticSamplers();
 
 	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
-		2,
+		3,
 		slotRootParameter,
 		(UINT)staticSamplers.size(),
 		staticSamplers.data(),
@@ -588,6 +602,7 @@ void D3D12Renderer::OnResize() {
 
 	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f*XM_PI, m_screenWidth / m_screenHeight, 1.0f, 1000.0f);
 	XMStoreFloat4x4(&m_projectionMatrix, P);
+	XMStoreFloat4x4(&m_CameraConstants.ProjectionViewMatrix, P);
 }
 
 void D3D12Renderer::CreateShadersAndInputLayout()

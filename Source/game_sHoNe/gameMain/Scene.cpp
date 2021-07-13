@@ -37,12 +37,10 @@ void Scene::Init()
 
 	auto texBox1 = std::make_shared<TexturedBox>(m_renderer, -5, 0, 1, 2, 2, 2, m_textures[L"woodCrate"]);
 	texBox1->create();
-	texBox1->setConstantBufferIndex(0);
 	m_Items.push_back(texBox1);
 
 	auto texBox2 = std::make_shared<TexturedBox>(m_renderer, 0, 0, 2.5, 5, 5, 5, m_textures[L"woodCrate"]);
 	texBox2->create();
-	texBox2->setConstantBufferIndex(1);
 	m_Items.push_back(texBox2);
 
 	/*auto plane = std::make_shared<PlaneDrawItem>(m_renderer, MathHelper::PositionVector{0,0,0}, 0);
@@ -51,7 +49,6 @@ void Scene::Init()
 
 	auto texturedPlane = std::make_shared<TexturedPlane>(m_renderer, MathHelper::PositionVector{ 0,0,0 }, 0, m_textures[L"checkboard"]);
 	texturedPlane->create();
-	texturedPlane->setConstantBufferIndex(2);
 	m_Items.push_back(texturedPlane);
 
 	m_renderer->UploadStaticGeometry(m_Items);
@@ -65,9 +62,12 @@ void Scene::setFpsOnWindow(std::wstring fps)
 
 void Scene::Draw()
 {
-	m_matrixStack = XMLoadFloat4x4(&m_camera.getViewMatrix());
+	//m_matrixStack = XMLoadFloat4x4(&m_camera.getViewMatrix());
 	m_renderer->PrepareDraw();
+	if(m_camera.isViewDirty())
+		m_renderer->setCameraView(m_camera.getViewMatrix());
 	for (auto& item : m_Items)
+		//TO DO: revisit matrixStack, maybe remove it
 		item->Draw(m_matrixStack);
 
 	m_renderer->Present();

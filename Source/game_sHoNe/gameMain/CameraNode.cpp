@@ -75,6 +75,12 @@ DirectX::XMFLOAT4X4 CameraNode::getViewMatrix()
 	return m_viewMatrix;
 }
 
+bool CameraNode::isViewDirty()
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+	return m_ViewDirty;
+}
+
 void CameraNode::OnUserButtonPressed(std::wstring button)
 {
 	if (button == L"W")

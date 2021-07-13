@@ -10,9 +10,20 @@ SamplerState gsamAnisotropicClamp : register(s5);
 
 cbuffer cbPerObject : register(b0)
 {
-	float4x4 gWorldViewProj;
+	//Transform to world space
+	float4x4 gWorld;
+	
 	float4x4 gTexTransform;
 };
+
+cbuffer cameraConstants : register(b1)
+{
+	//Transform to camera space
+	float4x4 gCameraViewMatrix;
+	
+	//Projection matrix from camera view to 2d screen
+	float4x4 gProjectionMatrix;
+}
 
 struct VertexIn
 {
@@ -22,7 +33,10 @@ struct VertexIn
 
 struct VertexOut
 {
+	//Homogeneous coordinates (projected on 2d screen)
 	float4 PosH  : SV_POSITION;
+	//Vertex world position
+	float3 PosW	 : POSITION;
 	float2 TexC	 : TEX;
 };
 
@@ -30,8 +44,12 @@ VertexOut VS(VertexIn vin)
 {
 	VertexOut vout;
 
-	// Transform to homogeneous clip space.
-	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
+	float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
+	// Transform to world clip space.
+	vout.PosW = posW.xyz;
+
+	float4x4 viewProj = mul(gCameraViewMatrix, gProjectionMatrix);
+	vout.PosH = mul(posH, viewProj);
 
 	// Transform texture.
 	vout.TexC = mul(float4(vin.TexC, 0.0f, 1.0f), gTexTransform).xy;
