@@ -28,8 +28,6 @@ bool TexturedPlane::loadGeometry()
 			float y = m_properties.position.y + 0;
 			float x = m_properties.position.x + j - (m - 1) / 2;
 
-			XMFLOAT4 color;
-
 			//float texX = (i/n)*7 <= 1.0001 ? (i / n) * 7 : (i / n) * 7 - 1;
 			//float texY = ((j / m) * 7) <= 1.0001 ? ((j / m) * 7) : ((j / m) * 7) - 1;
 			float texX = i * du;

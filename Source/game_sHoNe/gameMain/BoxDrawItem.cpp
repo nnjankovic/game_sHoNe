@@ -21,55 +21,55 @@ BoxDrawItem::~BoxDrawItem()
 
 bool BoxDrawItem::loadGeometry()
 {
-	float w = 0.5*m_width;
-	float h = 0.5*m_height;
-	float d = 0.5*m_depth;
+	float w = 0.5f*m_width;
+	float h = 0.5f*m_height;
+	float d = 0.5f*m_depth;
 
-	std::vector<Vertex> vertices =
+	std::vector<BasicVertex> vertices =
 	{
-		Vertex({ XMFLOAT3(m_properties.position.x - w,
+		BasicVertex({ XMFLOAT3(m_properties.position.x - w,
 						  m_properties.position.y - h, 
 						  m_properties.position.z - d),
 						  XMFLOAT4(Colors::White) }),
 
-		Vertex({ XMFLOAT3(m_properties.position.x - w, 
+		BasicVertex({ XMFLOAT3(m_properties.position.x - w, 
 						  m_properties.position.y + h,
 						  m_properties.position.z - d),
 						  XMFLOAT4(Colors::Black) }),
 
-		Vertex({ XMFLOAT3(m_properties.position.x + w,
+		BasicVertex({ XMFLOAT3(m_properties.position.x + w,
 						  m_properties.position.y + h, 
 						  m_properties.position.z - d), 
 						  XMFLOAT4(Colors::Red) }),
 
-		Vertex({ XMFLOAT3(m_properties.position.x + w, 
+		BasicVertex({ XMFLOAT3(m_properties.position.x + w, 
 						  m_properties.position.y - h, 
 						  m_properties.position.z - d), 
 						  XMFLOAT4(Colors::Blue) }),
 
-		Vertex({ XMFLOAT3(m_properties.position.x - w, 
+		BasicVertex({ XMFLOAT3(m_properties.position.x - w, 
 						  m_properties.position.y - h, 
 						  m_properties.position.z + d), 
 						  XMFLOAT4(Colors::Turquoise) }),
 
-		Vertex({ XMFLOAT3(m_properties.position.x - w, 
+		BasicVertex({ XMFLOAT3(m_properties.position.x - w, 
 						  m_properties.position.y + h, 
 						  m_properties.position.z + d), 
 						  XMFLOAT4(Colors::Goldenrod) }),
 
-		Vertex({ XMFLOAT3(m_properties.position.x + w, 
+		BasicVertex({ XMFLOAT3(m_properties.position.x + w, 
 						  m_properties.position.y + h, 
 						  m_properties.position.z + d), 
 						  XMFLOAT4(Colors::Yellow) }),
 
-		Vertex({ XMFLOAT3(m_properties.position.x + w, 
+		BasicVertex({ XMFLOAT3(m_properties.position.x + w, 
 						  m_properties.position.y - h, 
 						  m_properties.position.z + d), 
 						  XMFLOAT4(Colors::Salmon) })
 	};
 	m_geometry.vertices = vertices;//.data();
-	m_geometry.VertexBufferSize = static_cast<UINT>(vertices.size()) * sizeof(Vertex);
-	m_geometry.VertexByteStride = sizeof(Vertex);
+	m_geometry.VertexBufferSize = static_cast<UINT>(vertices.size()) * sizeof(BasicVertex);
+	m_geometry.VertexByteStride = sizeof(BasicVertex);
 
 	m_geometry.indices =
 	{

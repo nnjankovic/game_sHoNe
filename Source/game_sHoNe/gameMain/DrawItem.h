@@ -12,7 +12,7 @@
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
-struct Vertex
+struct BasicVertex
 {
 	XMFLOAT3 Pos;
 	XMFLOAT4 Color;
@@ -26,6 +26,7 @@ struct TexturedVertex {
 
 	XMFLOAT3 Pos;
 	XMFLOAT2 TexC;
+	XMFLOAT3 Normal;
 };
 
 struct Texture {
@@ -57,7 +58,7 @@ struct DrawItemProperties {
 };
 
 struct GeometryData {
-	std::vector<Vertex> vertices;
+	std::vector<BasicVertex> vertices;
 	std::vector<TexturedVertex> texVertices;
 	std::vector<std::uint16_t> indices;
 
@@ -104,6 +105,7 @@ public:
 		//createShadersAndInputLayout();
 		m_properties.constantBufferIndex = s_constantBuffer++;
 		loadGeometry();
+		computeNormals();
 		//m_renderer->createPSO(*this);
 	}
 
@@ -115,6 +117,7 @@ protected:
 	//virtual bool createShadersAndInputLayout() = 0;
 	virtual bool loadGeometry() = 0;
 	virtual bool loadTexture() { return false; }
+	virtual bool computeNormals();
 
 protected:
 	GeometryData m_geometry;

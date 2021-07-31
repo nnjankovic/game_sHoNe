@@ -242,7 +242,8 @@ void D3D12Renderer::Present()
 
 void D3D12Renderer::setCameraView(const XMFLOAT4X4 & CameraViewMatrix)
 {
-	m_CameraConstants.CameraViewMatrix = CameraViewMatrix;
+	XMMATRIX view = XMLoadFloat4x4(&CameraViewMatrix);
+	XMStoreFloat4x4(&m_CameraConstants.CameraViewMatrix, XMMatrixTranspose(view));
 }
 
 void D3D12Renderer::createPSO(shadersAndPSO& shader)
@@ -602,7 +603,7 @@ void D3D12Renderer::OnResize() {
 
 	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f*XM_PI, m_screenWidth / m_screenHeight, 1.0f, 1000.0f);
 	XMStoreFloat4x4(&m_projectionMatrix, P);
-	XMStoreFloat4x4(&m_CameraConstants.ProjectionViewMatrix, P);
+	XMStoreFloat4x4(&m_CameraConstants.ProjectionViewMatrix, XMMatrixTranspose(P));
 }
 
 void D3D12Renderer::CreateShadersAndInputLayout()

@@ -20,7 +20,7 @@ bool PlaneDrawItem::loadGeometry()
 
 	int numOfVertices = n*m;
 
-	std::vector<Vertex> vertices;
+	std::vector<BasicVertex> vertices;
 
 	for (int i = 0; i<n; i++)
 		for (int j = 0; j < m; j++)
@@ -37,7 +37,7 @@ bool PlaneDrawItem::loadGeometry()
 				color = XMFLOAT4(Colors::White);
 
 			vertices.push_back(
-				Vertex({ XMFLOAT3(x, y,z), color })
+				BasicVertex({ XMFLOAT3(x, y,z), color })
 			);
 		}
 
@@ -59,8 +59,8 @@ bool PlaneDrawItem::loadGeometry()
 	m_geometry.vertices = vertices;//.data();
 	m_geometry.indices = indices;
 
-	m_geometry.VertexBufferSize = static_cast<uint16_t>(vertices.size()) * sizeof(Vertex);
-	m_geometry.VertexByteStride = sizeof(Vertex);
+	m_geometry.VertexBufferSize = static_cast<uint16_t>(vertices.size()) * sizeof(BasicVertex);
+	m_geometry.VertexByteStride = sizeof(BasicVertex);
 	m_geometry.IndexBufferSize = static_cast<uint16_t>(m_geometry.indices.size()) * sizeof(uint16_t);
 
 	return true;

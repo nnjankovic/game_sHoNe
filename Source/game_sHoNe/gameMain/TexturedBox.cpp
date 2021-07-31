@@ -25,9 +25,9 @@ TexturedBox::~TexturedBox()
 
 bool TexturedBox::loadGeometry()
 {
-	float w = 0.5*m_width;
-	float h = 0.5*m_height;
-	float d = 0.5*m_depth;
+	float w = 0.5f*m_width;
+	float h = 0.5f*m_height;
+	float d = 0.5f*m_depth;
 
 	std::vector<TexturedVertex> vertices(24);
 
