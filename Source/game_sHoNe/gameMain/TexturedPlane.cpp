@@ -1,11 +1,16 @@
 #include "TexturedPlane.h"
 
-TexturedPlane::TexturedPlane(std::shared_ptr<IRenderer> renderer, MathHelper::PositionVector position, float angle, Texture tex) :
+using namespace Renderer3D;
+
+//TODO: revisit constructors, bad design
+TexturedPlane::TexturedPlane(std::shared_ptr<IRenderer> renderer, MathHelper::PositionVector position, float angle, 
+	const Renderer3D::Texture& tex, const Renderer3D::Material& mat) :
 	DrawItem(renderer)
 {
 	m_properties.position = position;
 	m_properties.shaderType = ShaderType::TEXTURED;
 	m_properties.texture = tex;
+	m_properties.material = mat;
 }
 
 
@@ -27,8 +32,6 @@ bool TexturedPlane::loadGeometry()
 			float z = m_properties.position.z + (n - 1) / 2 - i;
 			float y = m_properties.position.y + 0;
 			float x = m_properties.position.x + j - (m - 1) / 2;
-
-			XMFLOAT4 color;
 
 			//float texX = (i/n)*7 <= 1.0001 ? (i / n) * 7 : (i / n) * 7 - 1;
 			//float texY = ((j / m) * 7) <= 1.0001 ? ((j / m) * 7) : ((j / m) * 7) - 1;

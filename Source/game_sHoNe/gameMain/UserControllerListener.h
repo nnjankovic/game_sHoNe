@@ -1,4 +1,8 @@
 #pragma once
+
+#if !defined USER_CONTROLLER_LISTENER_
+#define		 USER_CONTROLLER_LISTENER_
+
 #include <string>
 #include "Utility.h"
 
@@ -34,9 +38,10 @@ private:
 	HWND m_parentWindow;
 	HINSTANCE m_hInstance;
 
-	std::vector<IUserControlCallback*> m_callbacks;
+	std::list<IUserControlCallback*> m_callbacks;
 private:
 	std::thread m_Thread;
 	std::mutex m_mutex;
 };
 
+#endif

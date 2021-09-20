@@ -33,8 +33,6 @@ using Microsoft::WRL::ComPtr;
 #include <DirectXMath.h>
 #include <cstdint>
 
-
-
 namespace MathHelper {
 	struct PositionVector {
 		float x;

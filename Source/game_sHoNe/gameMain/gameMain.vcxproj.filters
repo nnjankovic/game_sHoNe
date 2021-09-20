@@ -66,6 +66,9 @@
     <ClCompile Include="TexturedPlane.cpp">
       <Filter>Source Files\DrawItems</Filter>
     </ClCompile>
+    <ClCompile Include="Lights.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IRenderer.h">
@@ -112,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="TexturedPlane.h">
       <Filter>Header Files\GameView\DrawItems</Filter>
+    </ClInclude>
+    <ClInclude Include="Lights.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,10 +3,10 @@
 #include "Utility.h"
 
 class PlaneDrawItem :
-	public DrawItem
+	public Renderer3D::DrawItem
 {
 public:
-	PlaneDrawItem(std::shared_ptr<IRenderer> renderer, MathHelper::PositionVector position, float angle);
+	PlaneDrawItem(std::shared_ptr<Renderer3D::IRenderer> renderer, MathHelper::PositionVector position, float angle);
 	~PlaneDrawItem();
 
 private:

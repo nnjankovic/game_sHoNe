@@ -2,7 +2,7 @@
 
 
 
-BoxDrawItem::BoxDrawItem(std::shared_ptr<IRenderer> renderer, float x, float y, float z, float width, float height, float depth): 
+BoxDrawItem::BoxDrawItem(std::shared_ptr<Renderer3D::IRenderer> renderer, float x, float y, float z, float width, float height, float depth):
 	DrawItem(renderer),
 	m_height(height),
 	m_width(width),
@@ -21,55 +21,55 @@ BoxDrawItem::~BoxDrawItem()
 
 bool BoxDrawItem::loadGeometry()
 {
-	float w = 0.5*m_width;
-	float h = 0.5*m_height;
-	float d = 0.5*m_depth;
+	float w = 0.5f*m_width;
+	float h = 0.5f*m_height;
+	float d = 0.5f*m_depth;
 
-	std::vector<Vertex> vertices =
+	std::vector<Renderer3D::BasicVertex> vertices =
 	{
-		Vertex({ XMFLOAT3(m_properties.position.x - w,
+		Renderer3D::BasicVertex({ XMFLOAT3(m_properties.position.x - w,
 						  m_properties.position.y - h, 
 						  m_properties.position.z - d),
 						  XMFLOAT4(Colors::White) }),
 
-		Vertex({ XMFLOAT3(m_properties.position.x - w, 
+		Renderer3D::BasicVertex({ XMFLOAT3(m_properties.position.x - w,
 						  m_properties.position.y + h,
 						  m_properties.position.z - d),
 						  XMFLOAT4(Colors::Black) }),
 
-		Vertex({ XMFLOAT3(m_properties.position.x + w,
+		Renderer3D::BasicVertex({ XMFLOAT3(m_properties.position.x + w,
 						  m_properties.position.y + h, 
 						  m_properties.position.z - d), 
 						  XMFLOAT4(Colors::Red) }),
 
-		Vertex({ XMFLOAT3(m_properties.position.x + w, 
+		Renderer3D::BasicVertex({ XMFLOAT3(m_properties.position.x + w,
 						  m_properties.position.y - h, 
 						  m_properties.position.z - d), 
 						  XMFLOAT4(Colors::Blue) }),
 
-		Vertex({ XMFLOAT3(m_properties.position.x - w, 
+		Renderer3D::BasicVertex({ XMFLOAT3(m_properties.position.x - w,
 						  m_properties.position.y - h, 
 						  m_properties.position.z + d), 
 						  XMFLOAT4(Colors::Turquoise) }),
 
-		Vertex({ XMFLOAT3(m_properties.position.x - w, 
+		Renderer3D::BasicVertex({ XMFLOAT3(m_properties.position.x - w,
 						  m_properties.position.y + h, 
 						  m_properties.position.z + d), 
 						  XMFLOAT4(Colors::Goldenrod) }),
 
-		Vertex({ XMFLOAT3(m_properties.position.x + w, 
+		Renderer3D::BasicVertex({ XMFLOAT3(m_properties.position.x + w,
 						  m_properties.position.y + h, 
 						  m_properties.position.z + d), 
 						  XMFLOAT4(Colors::Yellow) }),
 
-		Vertex({ XMFLOAT3(m_properties.position.x + w, 
+		Renderer3D::BasicVertex({ XMFLOAT3(m_properties.position.x + w,
 						  m_properties.position.y - h, 
 						  m_properties.position.z + d), 
 						  XMFLOAT4(Colors::Salmon) })
 	};
 	m_geometry.vertices = vertices;//.data();
-	m_geometry.VertexBufferSize = static_cast<UINT>(vertices.size()) * sizeof(Vertex);
-	m_geometry.VertexByteStride = sizeof(Vertex);
+	m_geometry.VertexBufferSize = static_cast<UINT>(vertices.size()) * sizeof(Renderer3D::BasicVertex);
+	m_geometry.VertexByteStride = sizeof(Renderer3D::BasicVertex);
 
 	m_geometry.indices =
 	{
