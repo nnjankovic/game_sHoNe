@@ -11,6 +11,7 @@ public:
 	~CameraNode();
 
 	DirectX::XMFLOAT4X4 getViewMatrix();
+	DirectX::XMFLOAT3 getPosition() { return m_Position; }
 	bool isViewDirty();
 private:
 	// Inherited via IUserControlCallback
@@ -21,7 +22,7 @@ private:
 	void RotateH(double angle);
 	void RotateV(double angle);
 private:
-	DirectX::XMFLOAT3 m_Position = { 0.0f, 2.0f, -15.0f };
+	DirectX::XMFLOAT3 m_Position = { 0.0f, 12.0f, -15.0f };
 	DirectX::XMFLOAT3 m_Right = { 1.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 m_Up = { 0.0f, 1.0f, 0.0f };
 	DirectX::XMFLOAT3 m_LookAt = { 0.0f, 0.0f, 0.1f };

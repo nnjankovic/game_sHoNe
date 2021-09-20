@@ -94,7 +94,39 @@ LRESULT UserControllerListener::windowProc(HWND hWnd, UINT message, WPARAM wPara
 		case 'E':
 			button = L"E";
 			break;
-
+		case 'B':
+			button = L"B";
+			break;
+		case 'N':
+			button = L"N";
+			break;
+		case 'M':
+			button = L"M";
+			break;
+		case VK_LEFT:
+			button = L"LEFT";
+			break;
+		case VK_UP:
+			button = L"FORWARD";
+			break;
+		case VK_RIGHT:
+			button = L"RIGHT";
+			break;
+		case VK_DOWN:
+			button = L"BACK";
+			break;
+		case VK_OEM_PLUS:
+			button = L"PLUS";
+			break;
+		case VK_OEM_MINUS:
+			button = L"MINUS";
+			break;
+		case 33 : //PAGE_UP
+			button = L"UP";
+			break;
+		case 34: //PAGE_DOWN
+			button = L"DOWN";
+			break;
 		default:
 			std::cout << wParam << " ";
 			break;
@@ -126,7 +158,39 @@ LRESULT UserControllerListener::windowProc(HWND hWnd, UINT message, WPARAM wPara
 		case 'E':
 			button = L"E";
 			break;
-
+		case 'B':
+			button = L"B";
+			break;
+		case 'N':
+			button = L"N";
+			break;
+		case 'M':
+			button = L"M";
+			break;
+		case VK_LEFT:
+			button = L"LEFT";
+			break;
+		case VK_UP:
+			button = L"FORWARD";
+			break;
+		case VK_RIGHT:
+			button = L"RIGHT";
+			break;
+		case VK_DOWN:
+			button = L"BACK";
+			break;
+		case VK_OEM_PLUS:
+			button = L"PLUS";
+			break;
+		case VK_OEM_MINUS:
+			button = L"MINUS";
+			break;
+		case 33: //PAGE_UP
+			button = L"UP";
+			break;
+		case 34: // PAGE_DOWN
+			button = L"DOWN";
+			break;
 		default:
 			std::cout << wParam << " ";
 			break;
@@ -157,10 +221,16 @@ void UserControllerListener::RegisterCallback(IUserControlCallback* callback)
 
 void UserControllerListener::UnRegisterCallback(IUserControlCallback* callback)
 {
-	//std::lock_guard<std::mutex> lock(m_mutex);
-	//for (auto& cb : m_callbacks)
-		//if (cb.lock() == callback.lock())
-			//m_callbacks.remove(cb);
+	//TO_DO: fix this
+	/*std::lock_guard<std::mutex> lock(m_mutex);
+
+	auto iter = m_callbacks.begin();
+	while (iter != m_callbacks.end())
+	{
+		if ((*iter) == callback)
+			iter = m_callbacks.erase(iter);
+		iter++;
+	}*/
 }
 
 bool UserControllerListener::registerWindow()

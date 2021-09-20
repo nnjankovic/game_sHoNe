@@ -103,6 +103,10 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
+    <PostBuildEvent>
+      <Command>xcopy /y "$(SolutionDir)gameMain\Shaders" "$(OutDir)Shaders"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -137,6 +141,7 @@
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="DrawItem.cpp" />
     <ClCompile Include="GameTimer.cpp" />
+    <ClCompile Include="Lights.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlaneDrawItem.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -154,6 +159,7 @@
     <ClInclude Include="DrawItem.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="IRenderer.h" />
+    <ClInclude Include="Lights.h" />
     <ClInclude Include="PlaneDrawItem.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="TexturedBox.h" />

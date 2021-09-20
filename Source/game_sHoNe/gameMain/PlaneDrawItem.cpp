@@ -1,6 +1,6 @@
 #include "PlaneDrawItem.h"
 
-
+using namespace Renderer3D;
 
 PlaneDrawItem::PlaneDrawItem(std::shared_ptr<IRenderer> renderer, MathHelper::PositionVector position, float angle) : 
 	DrawItem(renderer)

@@ -4,6 +4,7 @@
 #include "BoxDrawItem.h"
 #include "UserControllerListener.h"
 #include "CameraNode.h"
+#include "Lights.h"
 
 #include <memory>
 #include <map>
@@ -24,10 +25,15 @@ public:
 
 private:
 	void UploadTextures();
+	void BuildLights();
+	void UploadLights();
+	void BuildMaterials();
 
 private:
-	std::vector<std::shared_ptr<DrawItem>> m_Items;
-	std::shared_ptr<IRenderer> m_renderer;
+	std::vector<std::shared_ptr<Renderer3D::DrawItem>> m_Items;
+	std::map<LightTypes::LightType, std::shared_ptr<LightTypes::Light>> m_lights;
+	std::map<std::wstring, Renderer3D::Material> m_materials;
+	std::shared_ptr<Renderer3D::IRenderer> m_renderer;
 	HINSTANCE m_hInstance;
 	
 	std::shared_ptr<GameTimer> m_timer;
@@ -39,6 +45,6 @@ private:
 	
 	CameraNode m_camera;
 
-	std::map<std::wstring ,Texture> m_textures;
+	std::map<std::wstring ,Renderer3D::Texture> m_textures;
 };
 

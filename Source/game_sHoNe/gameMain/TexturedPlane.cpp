@@ -1,11 +1,16 @@
 #include "TexturedPlane.h"
 
-TexturedPlane::TexturedPlane(std::shared_ptr<IRenderer> renderer, MathHelper::PositionVector position, float angle, Texture tex) :
+using namespace Renderer3D;
+
+//TODO: revisit constructors, bad design
+TexturedPlane::TexturedPlane(std::shared_ptr<IRenderer> renderer, MathHelper::PositionVector position, float angle, 
+	const Renderer3D::Texture& tex, const Renderer3D::Material& mat) :
 	DrawItem(renderer)
 {
 	m_properties.position = position;
 	m_properties.shaderType = ShaderType::TEXTURED;
 	m_properties.texture = tex;
+	m_properties.material = mat;
 }
 
 

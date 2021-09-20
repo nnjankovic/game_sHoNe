@@ -1,8 +1,10 @@
 #include "TexturedBox.h"
 
+using namespace Renderer3D;
 
-
-TexturedBox::TexturedBox(std::shared_ptr<IRenderer> renderer, float x, float y, float z, float width, float height, float depth, Texture tex) :
+//TODO: revisit constructors, expand drawItem constructor to take material and texture
+TexturedBox::TexturedBox(std::shared_ptr<IRenderer> renderer, float x, float y, float z, float width, float height, float depth, 
+	const Renderer3D::Texture& tex, const Renderer3D::Material& mat) :
 	DrawItem(renderer),
 	m_height(height),
 	m_width(width),
@@ -12,6 +14,7 @@ TexturedBox::TexturedBox(std::shared_ptr<IRenderer> renderer, float x, float y, 
 	m_properties.position.y = y;
 	m_properties.position.z = z;
 	m_properties.texture = tex;
+	m_properties.material = mat;
 
 	m_properties.shaderType = ShaderType::TEXTURED;
 
