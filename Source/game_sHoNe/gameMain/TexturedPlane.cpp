@@ -13,6 +13,10 @@ TexturedPlane::TexturedPlane(std::shared_ptr<IRenderer> renderer, MathHelper::Po
 	m_properties.material = mat;
 }
 
+TexturedPlane::~TexturedPlane()
+{
+}
+
 
 bool TexturedPlane::loadGeometry()
 {

@@ -188,6 +188,6 @@ void Scene::BuildMaterials()
 	glass.index = 4;
 	glass.materialConstants.diffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	glass.materialConstants.fresnelR0 = XMFLOAT3(1.0f, 1.0f, 1.0f);
-	glass.materialConstants.roughness = 1.0f;
+	glass.materialConstants.roughness = 0.99f;
 	m_materials[glass.name] = glass;
 }
