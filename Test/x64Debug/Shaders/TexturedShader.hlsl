@@ -94,10 +94,12 @@ float4 PS(VertexOut pin) : SV_Target
 	float4 diffuseAlbedo = gTexture.Sample(gsamAnisotropicWrap, pin.TexC)*gDiffuseAlbedo;
 	float4 ambient = diffuseAlbedo*gAmbientLight;
 
+	float3 toEye = normalize(gEyePosW - pin.PosW);
 	Material material = { diffuseAlbedo, gFresnelR0, gRoughness };
 
-	float4 lightAggregate = ComputeLighting(gLights, gNumOfLights, pin.NormalW, pin.PosW, material);
+	float4 lightAggregate = ComputeLighting(gLights, gNumOfLights, pin.NormalW, pin.PosW, material, toEye);
 
+	//add ambient light
 	float4 litColor = ambient + lightAggregate;
 	litColor.a = diffuseAlbedo.a;
 

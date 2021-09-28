@@ -20,3 +20,13 @@
 *.bmp
 *.ilk
 *.ilk
+Source/game_sHoNe/.vs/game_sHoNe/v15/.suo
+*.db-shm
+*.db-wal
+*.log
+*.log
+*.tlog
+*.tlog
+Temp/gameMainx64Debug/gameMain.tlog/CL.command.1.tlog
+Temp/gameMainx64Debug/gameMain.tlog/CL.command.1.tlog
+Source/game_sHoNe/.vs/game_sHoNe/v15/.suo
