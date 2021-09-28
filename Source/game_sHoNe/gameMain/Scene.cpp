@@ -76,19 +76,22 @@ void Scene::UploadTextures()
 {
 	Renderer3D::Texture woodCrateTexture;
 	woodCrateTexture.name = L"woodCrate";
-	woodCrateTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WoodCrate01.dds";
+	//woodCrateTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WoodCrate01.dds";
+	woodCrateTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WoodCrate01.dds";
 	m_renderer->UploadTexture(woodCrateTexture);
 	m_textures[woodCrateTexture.name] = woodCrateTexture;
 
 	Renderer3D::Texture checkboardTexture;
 	checkboardTexture.name = L"checkboard";
-	checkboardTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\checkboard.dds";
+	//checkboardTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\checkboard.dds";
+	checkboardTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\checkboard.dds";
 	m_renderer->UploadTexture(checkboardTexture);
 	m_textures[checkboardTexture.name] = checkboardTexture;
 
 	Renderer3D::Texture tileTexture;
 	tileTexture.name = L"tile";
-	tileTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\tile.dds";
+	//tileTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\tile.dds";
+	tileTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\tile.dds";
 	m_renderer->UploadTexture(tileTexture);
 	m_textures[tileTexture.name] = tileTexture;
 }
