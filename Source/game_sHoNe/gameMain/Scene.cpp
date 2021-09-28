@@ -28,9 +28,13 @@ void Scene::Init()
 	texBox2->create();
 	m_Items.push_back(texBox2);
 
-	auto texBox3 = std::make_shared<TexturedBox>(m_renderer, 10, 10, 10, 5, 5, 5, m_textures[L"tile"], m_materials[L"tile"]);
+	auto texBox3 = std::make_shared<TexturedBox>(m_renderer, 10, 2.5, 0, 5, 5, 5, m_textures[L"tile"], m_materials[L"tile"]);
 	texBox3->create();
 	m_Items.push_back(texBox3);
+
+	auto texBox4 = std::make_shared<TexturedBox>(m_renderer, 7.5, 2.5, 0, 5, 5, 5, m_textures[L"tile"], m_materials[L"glass"]);
+	texBox4->create();
+	m_Items.push_back(texBox4);
 
 	/*auto plane = std::make_shared<PlaneDrawItem>(m_renderer, MathHelper::PositionVector{0,0,0}, 0);
 	plane->create();
@@ -56,8 +60,10 @@ void Scene::Draw()
 	//m_matrixStack = XMLoadFloat4x4(&m_camera.getViewMatrix());
 	m_renderer->PrepareDraw();
 
-	if(m_camera.isViewDirty())
+	if (m_camera.isViewDirty()) {
 		m_renderer->setCameraView(m_camera.getViewMatrix());
+		m_renderer->setEyePosition(m_camera.getPosition());
+	}
 
 	UploadLights();
 
@@ -108,9 +114,9 @@ void Scene::BuildLights()
 
 	LightTypes::LightParams pointLightParams;
 	pointLightParams.lightType = LightTypes::LightType::POINT;
-	pointLightParams.Strength = { 1, 0.5, 0.5 };
+	pointLightParams.Strength = { 1, 1, 0.8 };
 	pointLightParams.Position = { 0, 8, 0 };
-	pointLightParams.FalloffEnd = 20;
+	pointLightParams.FalloffEnd = 30;
 	auto pointLight = std::make_shared<LightTypes::Light>(m_userControlListener, pointLightParams);
 	m_lights[pointLightParams.lightType] = pointLight;
 
@@ -176,4 +182,12 @@ void Scene::BuildMaterials()
 	woodCrate.materialConstants.fresnelR0 = XMFLOAT3(0.05f, 0.05f, 0.05f);
 	woodCrate.materialConstants.roughness = 0.2f;
 	m_materials[woodCrate.name] = woodCrate;
+
+	Renderer3D::Material glass;
+	glass.name = L"glass";
+	glass.index = 4;
+	glass.materialConstants.diffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	glass.materialConstants.fresnelR0 = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	glass.materialConstants.roughness = 1.0f;
+	m_materials[glass.name] = glass;
 }
