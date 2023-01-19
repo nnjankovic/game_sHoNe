@@ -34,10 +34,15 @@ using Microsoft::WRL::ComPtr;
 #include <cstdint>
 
 namespace MathHelper {
-	struct PositionVector {
+	struct Position3 {
 		float x;
 		float y;
 		float z;
+	};
+
+	struct Position2 {
+		float x;
+		float y;
 	};
 
 	static DirectX::XMFLOAT4X4 Identity4x4()
@@ -50,7 +55,12 @@ namespace MathHelper {
 
 		return I;
 	}
+
+	DirectX::XMFLOAT3 Normalize(const DirectX::XMFLOAT3 value);
+	
 }
+
+
 
 static UINT CalcConstantBufferByteSize(UINT byteSize)
 {

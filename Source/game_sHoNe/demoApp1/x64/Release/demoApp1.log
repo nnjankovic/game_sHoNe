@@ -3,10 +3,3 @@ c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\demoapp1
 c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\demoapp1\boxapp.cpp(133): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
 c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\demoapp1\boxapp.cpp(135): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
   D3dApp.cpp
-c:\users\nenad.n.jankovic\documents\github\game_shone\source\game_shone\demoapp1\d3dapp.h(24): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
-  Generating code
-  7 of 924 functions ( 0.8%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    16 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  demoApp1.vcxproj -> C:\Users\nenad.n.jankovic\Documents\GitHub\game_sHoNe\Source\game_sHoNe\x64\Release\demoApp1.exe

@@ -103,6 +103,18 @@ LRESULT UserControllerListener::windowProc(HWND hWnd, UINT message, WPARAM wPara
 		case 'M':
 			button = L"M";
 			break;
+		case 'I':
+			button = L"I";
+			break;
+		case 'J':
+			button = L"J";
+			break;
+		case 'K':
+			button = L"K";
+			break;
+		case 'L':
+			button = L"L";
+			break;
 		case VK_LEFT:
 			button = L"LEFT";
 			break;
@@ -166,6 +178,18 @@ LRESULT UserControllerListener::windowProc(HWND hWnd, UINT message, WPARAM wPara
 			break;
 		case 'M':
 			button = L"M";
+			break;
+		case 'I':
+			button = L"I";
+			break;
+		case 'J':
+			button = L"J";
+			break;
+		case 'K':
+			button = L"K";
+			break;
+		case 'L':
+			button = L"L";
 			break;
 		case VK_LEFT:
 			button = L"LEFT";

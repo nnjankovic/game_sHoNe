@@ -3,6 +3,8 @@
 #include "PlaneDrawItem.h"
 #include "TexturedBox.h"
 #include "TexturedPlane.h"
+#include "LoadedDrawItem.h"
+#include "MoveOnInputDrawItemComponent.h"
 
 Scene::Scene(HINSTANCE hInstance, std::shared_ptr<UserControllerListener> userControlListener, std::shared_ptr<GameTimer> timer) : 
 	m_hInstance(hInstance),
@@ -20,15 +22,59 @@ void Scene::Init()
 	UploadTextures();
 	BuildMaterials();
 
-	auto texBox1 = std::make_shared<TexturedBox>(m_renderer, -5, 0, 1, 2, 2, 2, m_textures[L"woodCrate"], m_materials[L"woodCrate"]);
+	/*auto texBox1 = std::make_shared<TexturedBox>(m_renderer, -5, -15, 25, 2, 2, 2, m_textures[L"woodCrate"], m_materials[L"woodCrate"]);
 	texBox1->create();
-	m_Items.push_back(texBox1);
+	m_Items.push_back(texBox1);*/
 
-	auto texBox2 = std::make_shared<TexturedBox>(m_renderer, 0, 0, 2.5, 5, 5, 5, m_textures[L"woodCrate"], m_materials[L"woodCrate"]);
+	auto texBox2 = std::make_shared<TexturedBox>(m_renderer, 0, 2.5, 14.5, 5, 5, 5, m_textures[L"woodCrate"], m_materials[L"woodCrate"]);
+	auto moveComponent = std::make_shared<Renderer3D::MoveOnInputDrawItemComponent>(texBox2, [](Renderer3D::DrawItemProperties& properties, std::wstring button) {
+		float inc = 0.7;
+		if (button == L"I")
+		{
+			properties.position.z += inc;
+		}
+		else if (button == L"K")
+		{
+			properties.position.z -= inc;
+		}
+		else if (button == L"J")
+		{
+			properties.position.x -= inc;
+		}
+		else if (button == L"L")
+		{
+			properties.position.x += inc;
+		}
+	}, m_userControlListener);
+	texBox2->addComponent(moveComponent);
 	texBox2->create();
 	m_Items.push_back(texBox2);
 
-	auto texBox3 = std::make_shared<TexturedBox>(m_renderer, 10, 2.5, 0, 5, 5, 5, m_textures[L"tile"], m_materials[L"tile"]);
+	auto reflectedTexBox2 = std::make_shared<TexturedBox>(m_renderer, 0, 2.5, 34.5, 5, 5, 5, m_textures[L"woodCrate"], m_materials[L"woodCrate"]);
+	auto refMoveComponent = std::make_shared<Renderer3D::MoveOnInputDrawItemComponent>(reflectedTexBox2, [](Renderer3D::DrawItemProperties& properties, std::wstring button) {
+		float inc = 0.7;
+		if (button == L"I")
+		{
+			properties.position.z -= inc;
+		}
+		else if (button == L"K")
+		{
+			properties.position.z += inc;
+		}
+		else if (button == L"J")
+		{
+			properties.position.x -= inc;
+		}
+		else if (button == L"L")
+		{
+			properties.position.x += inc;
+		}
+	}, m_userControlListener);
+	reflectedTexBox2->addComponent(refMoveComponent);
+	reflectedTexBox2->create();
+	m_Reflections.push_back(reflectedTexBox2);
+
+	auto texBox3 = std::make_shared<TexturedBox>(m_renderer, 12.5, 2.5, 0, 5, 5, 5, m_textures[L"tile"], m_materials[L"tile"]);
 	texBox3->create();
 	m_Items.push_back(texBox3);
 
@@ -40,13 +86,66 @@ void Scene::Init()
 	plane->create();
 	m_Items.push_back(plane);*/
 
-	auto texturedPlane = std::make_shared<TexturedPlane>(m_renderer, MathHelper::PositionVector{ 0,0,0 }, 0, m_textures[L"checkboard"], m_materials[L"stone"]);
+	auto texturedPlane = std::make_shared<TexturedPlane>(m_renderer, MathHelper::Position3{ 0,0,0 }, 
+														 50, 50, 0, 1, 
+														 m_textures[L"checkboard"], MathHelper::Position2{6,6},
+														 m_materials[L"stone"]);
 	texturedPlane->create();
 	m_Items.push_back(texturedPlane);
 
+	auto reflectedTexturedPlane = std::make_shared<TexturedPlane>(m_renderer, MathHelper::Position3{ 0,0,49.5 },
+		50, 50, 0, 1,
+		m_textures[L"checkboard"], MathHelper::Position2{ 6,6 },
+		m_materials[L"stone"]);
+	reflectedTexturedPlane->create();
+	m_Reflections.push_back(reflectedTexturedPlane); //TODO: Fix planes, need to be able to change position
+
+
+
+	/*MathHelper::Position3 wallPosition{ 0, 24.5, 24 };
+	int wallM = 50;
+	int wallN = 25;
+	auto texturedWallBack = std::make_shared<TexturedPlane>(m_renderer, wallPosition, wallM, wallN, 1.5708, m_textures[L"tile"], m_materials[L"stone"]);
+	texturedWallBack->create();
+	m_Items.push_back(texturedWallBack);
+	auto texturedWallFront = std::make_shared<TexturedPlane>(m_renderer, wallPosition, wallM, wallN, -1.5708, m_textures[L"tile"], m_materials[L"stone"]);
+	texturedWallFront->create();
+	m_Items.push_back(texturedWallFront);*/
+
+	auto mirror = std::make_shared<TexturedPlane>(m_renderer, MathHelper::Position3{ -18,13,24.4 },
+		2, 2, -1.5708, 12,
+		m_textures[L"ice"], MathHelper::Position2{ 1,1 },
+		m_materials[L"mirror"],
+		Renderer3D::ShaderType::Transparent);
+	mirror->create();
+	m_Mirrors.push_back(mirror);
+
+	auto loadPlane = std::make_shared<LoadedDrawItem>(m_renderer, L"Models\\plane1.obj", MathHelper::Position3{ 0, 7.5, 24.5}, -1.5708, 1, m_textures[L"tile"], m_materials[L"brick"]);
+	loadPlane->create();
+	m_Transparent.push_back(loadPlane);
+
+	auto wireBox1 = std::make_shared<TexturedBox>(m_renderer, -5, 2.5, -5, 5, 5, 5, m_textures[L"wire"], m_materials[L"wire"], Renderer3D::ShaderType::AlphaTest);
+	wireBox1->create();
+	m_Transparent.push_back(wireBox1);
+
+	/*auto transparentBox1 = std::make_shared<TexturedBox>(m_renderer, 0, 7.6, -5, 5, 5, 5, m_textures[L"ice"], m_materials[L"ice"], Renderer3D::ShaderType::Transparent);
+	transparentBox1->create();
+	m_Items.push_back(transparentBox1);*/
+
+	
+	auto loadSphere = std::make_shared<LoadedDrawItem>(m_renderer, L"Models\\sphere.obj", MathHelper::Position3{ 0, 3, -10}, 0, 3, m_textures[L"ice"], m_materials[L"ice"], Renderer3D::ShaderType::Transparent);
+	loadSphere->create();
+	m_Transparent.push_back(loadSphere);
+
 	BuildLights();
 
-	m_renderer->UploadStaticGeometry(m_Items);
+	std::vector<std::shared_ptr<Renderer3D::DrawItem>> allItems;
+	allItems.reserve(m_Items.size() + m_Mirrors.size() + m_Transparent.size() + m_Reflections.size());
+	allItems.insert(allItems.end(), m_Items.begin(), m_Items.end());
+	allItems.insert(allItems.end(), m_Mirrors.begin(), m_Mirrors.end());
+	allItems.insert(allItems.end(), m_Reflections.begin(), m_Reflections.end());
+	allItems.insert(allItems.end(), m_Transparent.begin(), m_Transparent.end());
+	m_renderer->UploadStaticGeometry(allItems);
 }
 
 
@@ -67,9 +166,7 @@ void Scene::Draw()
 
 	UploadLights();
 
-	for (auto& item : m_Items)
-		//TO DO: revisit matrixStack, maybe remove it
-		item->Draw(m_matrixStack);
+	DrawAllItems();
 
 	m_renderer->Present();
 }
@@ -82,48 +179,69 @@ void Scene::UploadTextures()
 {
 	Renderer3D::Texture woodCrateTexture;
 	woodCrateTexture.name = L"woodCrate";
-	//woodCrateTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WoodCrate01.dds";
-	woodCrateTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WoodCrate01.dds";
+	woodCrateTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WoodCrate01.dds";
+	//woodCrateTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WoodCrate01.dds";
 	m_renderer->UploadTexture(woodCrateTexture);
 	m_textures[woodCrateTexture.name] = woodCrateTexture;
 
 	Renderer3D::Texture checkboardTexture;
 	checkboardTexture.name = L"checkboard";
-	//checkboardTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\checkboard.dds";
-	checkboardTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\checkboard.dds";
+	checkboardTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\checkboard.dds";
+	//checkboardTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\checkboard.dds";
 	m_renderer->UploadTexture(checkboardTexture);
 	m_textures[checkboardTexture.name] = checkboardTexture;
 
 	Renderer3D::Texture tileTexture;
 	tileTexture.name = L"tile";
-	//tileTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\tile.dds";
-	tileTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\tile.dds";
+	tileTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\tile.dds";
+	//tileTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\tile.dds";
 	m_renderer->UploadTexture(tileTexture);
 	m_textures[tileTexture.name] = tileTexture;
+
+	Renderer3D::Texture iceTexture;
+	iceTexture.name = L"ice";
+	iceTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\ice.dds";
+	//tileTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\ice.dds";
+	m_renderer->UploadTexture(iceTexture);
+	m_textures[iceTexture.name] = iceTexture;
+
+	Renderer3D::Texture wireTexture;
+	wireTexture.name = L"wire";
+	wireTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WireFence.dds";
+	//tileTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WireFence.dds";
+	m_renderer->UploadTexture(wireTexture);
+	m_textures[wireTexture.name] = wireTexture;
+
+	Renderer3D::Texture brick3Texture;
+	brick3Texture.name = L"brick3";
+	brick3Texture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\bricks3.dds";
+	//tileTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WireFence.dds";
+	m_renderer->UploadTexture(brick3Texture);
+	m_textures[brick3Texture.name] = brick3Texture;
 }
 
 void Scene::BuildLights()
 {
 	
-	/*LightTypes::LightParams directLightParams;
+	LightTypes::LightParams directLightParams;
 	directLightParams.lightType = LightTypes::LightType::DIRECTIONAL;
 	directLightParams.Direction = { 0.57735f, -0.57735f, 0.57735f };
-	directLightParams.Strength = { 1, 1, 1 };
+	directLightParams.Strength = { 0.5, 0.5, 0.5 };
 	auto directLight = std::make_shared<LightTypes::Light>(m_userControlListener, directLightParams);
-	m_lights[directLightParams.lightType] = directLight;*/
+	m_lights[directLightParams.lightType] = directLight;
 
 	LightTypes::LightParams pointLightParams;
 	pointLightParams.lightType = LightTypes::LightType::POINT;
-	pointLightParams.Strength = { 1, 1, 0.8 };
+	pointLightParams.Strength = { 1, 1, 1 };
 	pointLightParams.Position = { 0, 8, 0 };
-	pointLightParams.FalloffEnd = 30;
+	pointLightParams.FalloffEnd = 20;
 	auto pointLight = std::make_shared<LightTypes::Light>(m_userControlListener, pointLightParams);
 	m_lights[pointLightParams.lightType] = pointLight;
 
 	
 	/*LightTypes::LightParams spotLightParams;
 	spotLightParams.lightType = LightTypes::LightType::SPOT;
-	spotLightParams.Strength = { 0.0f, 0.0f, 1.0f };
+	spotLightParams.Strength = { 1.0f, 1.0f, 1.0f };
 	spotLightParams.Position = { 5, 8, 5 };
 	spotLightParams.Direction = { 0, -1, 0 };
 	spotLightParams.SpotPower = 30;
@@ -190,4 +308,58 @@ void Scene::BuildMaterials()
 	glass.materialConstants.fresnelR0 = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	glass.materialConstants.roughness = 0.99f;
 	m_materials[glass.name] = glass;
+
+	Renderer3D::Material ice;
+	ice.name = L"ice";
+	ice.index = 5;
+	ice.materialConstants.diffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.7f);
+	ice.materialConstants.fresnelR0 = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	ice.materialConstants.roughness = 0.99f;
+	m_materials[ice.name] = ice;
+
+	Renderer3D::Material wire;
+	wire.name = L"wire";
+	wire.index = 6;
+	wire.materialConstants.diffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.8f);
+	wire.materialConstants.fresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
+	wire.materialConstants.roughness = 0.25f;
+	m_materials[wire.name] = wire;
+
+	Renderer3D::Material mirror;
+	mirror.name = L"mirror";
+	mirror.index = 7;
+	mirror.materialConstants.diffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.3f);
+	mirror.materialConstants.fresnelR0 = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	mirror.materialConstants.roughness = 0.99f;
+	m_materials[mirror.name] = mirror;
+}
+
+void Scene::DrawAllItems()
+{
+	//TO DO: revisit matrixStack, maybe remove it
+	for (auto& item : m_Items)
+		item->Draw(m_matrixStack);
+
+	for (auto& item : m_Mirrors)
+	{
+		item->changeShaderType(Renderer3D::ShaderType::Mirror);
+		item->Draw(m_matrixStack);
+	}
+
+	for (auto& item : m_Reflections)
+	{
+		item->changeShaderType(Renderer3D::ShaderType::Reflection);
+		item->Draw(m_matrixStack);
+	}
+
+	for (auto& item : m_Mirrors)
+	{
+		item->changeShaderType(Renderer3D::ShaderType::Transparent);
+		item->Draw(m_matrixStack);
+	}
+
+	for (auto& item : m_Transparent)
+	{
+		item->Draw(m_matrixStack);		
+	}
 }

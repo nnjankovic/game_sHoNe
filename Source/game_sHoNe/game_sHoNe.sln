@@ -3,11 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
-<<<<<<< HEAD
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demoApp1", "demoApp1\demoApp1.vcxproj", "{62D5F99D-6EEE-430E-A442-B540B26BF5B2}"
-=======
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gameMain", "gameMain\gameMain.vcxproj", "{D5D3D7E2-7ABB-426C-A077-E7D6DD4181F1}"
->>>>>>> 8e5271efd3e94b091e063ec91d3e052547162edb
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,16 +13,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-<<<<<<< HEAD
-		{62D5F99D-6EEE-430E-A442-B540B26BF5B2}.Debug|x64.ActiveCfg = Debug|x64
-		{62D5F99D-6EEE-430E-A442-B540B26BF5B2}.Debug|x64.Build.0 = Debug|x64
-		{62D5F99D-6EEE-430E-A442-B540B26BF5B2}.Debug|x86.ActiveCfg = Debug|Win32
-		{62D5F99D-6EEE-430E-A442-B540B26BF5B2}.Debug|x86.Build.0 = Debug|Win32
-		{62D5F99D-6EEE-430E-A442-B540B26BF5B2}.Release|x64.ActiveCfg = Release|x64
-		{62D5F99D-6EEE-430E-A442-B540B26BF5B2}.Release|x64.Build.0 = Release|x64
-		{62D5F99D-6EEE-430E-A442-B540B26BF5B2}.Release|x86.ActiveCfg = Release|Win32
-		{62D5F99D-6EEE-430E-A442-B540B26BF5B2}.Release|x86.Build.0 = Release|Win32
-=======
 		{D5D3D7E2-7ABB-426C-A077-E7D6DD4181F1}.Debug|x64.ActiveCfg = Debug|x64
 		{D5D3D7E2-7ABB-426C-A077-E7D6DD4181F1}.Debug|x64.Build.0 = Debug|x64
 		{D5D3D7E2-7ABB-426C-A077-E7D6DD4181F1}.Debug|x86.ActiveCfg = Debug|Win32
@@ -35,7 +21,6 @@ Global
 		{D5D3D7E2-7ABB-426C-A077-E7D6DD4181F1}.Release|x64.Build.0 = Release|x64
 		{D5D3D7E2-7ABB-426C-A077-E7D6DD4181F1}.Release|x86.ActiveCfg = Release|Win32
 		{D5D3D7E2-7ABB-426C-A077-E7D6DD4181F1}.Release|x86.Build.0 = Release|Win32
->>>>>>> 8e5271efd3e94b091e063ec91d3e052547162edb
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -61,7 +61,7 @@ float3 BlinnPhong(float3 lightStrength, float3 lightVec, float3 normal, float3 t
 	return (mat.DiffuseAlbedo.rgb + specularAlbedo)*lightStrength;
 }
 
-float3 ComputeDirectionalLight(Light dirLight, float3 normal)
+float3 ComputeDirectionalLight(Light dirLight, float3 normal, float3 toEye, Material material)
 {
 	float3 L = -dirLight.Direction;
 	L = normalize(L);
@@ -69,7 +69,7 @@ float3 ComputeDirectionalLight(Light dirLight, float3 normal)
 	//max(L*n, 0) * Bl
 	float3 lightStrength = dirLight.Strength * max(dot(L, normal), 0.0f);
 
-	return lightStrength;
+	return BlinnPhong(lightStrength, L, normal, toEye, material);
 }
 
 float3 ComputePointLight(Light pointLight, float3 normal, float3 vertexWorldPosition, float3 toEye, Material material) {
@@ -128,7 +128,7 @@ float4 ComputeLighting(Light gLight[MAX_LIGHTS], int gNumOfLights,
 	for (i = 0; i < gNumOfLights; i++)
 	{
 		if (gLight[i].ligthType.x == 0.0f)
-			result += ComputeDirectionalLight(gLight[i], normal);
+			result += ComputeDirectionalLight(gLight[i], normal, toEye, material);
 		else if (gLight[i].ligthType.x == 1.0f)
 			result += ComputePointLight(gLight[i], normal, vertexWorldPosition, toEye, material);
 		else if (gLight[i].ligthType.x == 2.0f)

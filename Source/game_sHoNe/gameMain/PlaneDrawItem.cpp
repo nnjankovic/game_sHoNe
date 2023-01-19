@@ -2,7 +2,7 @@
 
 using namespace Renderer3D;
 
-PlaneDrawItem::PlaneDrawItem(std::shared_ptr<IRenderer> renderer, MathHelper::PositionVector position, float angle) : 
+PlaneDrawItem::PlaneDrawItem(std::shared_ptr<IRenderer> renderer, MathHelper::Position3 position, float angle) : 
 	DrawItem(renderer)
 {
 	m_properties.position = position;

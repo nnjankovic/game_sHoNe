@@ -28,9 +28,14 @@ private:
 	void BuildLights();
 	void UploadLights();
 	void BuildMaterials();
+	void DrawAllItems();
 
 private:
 	std::vector<std::shared_ptr<Renderer3D::DrawItem>> m_Items;
+	std::vector<std::shared_ptr<Renderer3D::DrawItem>> m_Mirrors;
+	std::vector<std::shared_ptr<Renderer3D::DrawItem>> m_Reflections;
+	std::vector<std::shared_ptr<Renderer3D::DrawItem>> m_Transparent;
+
 	std::map<LightTypes::LightType, std::shared_ptr<LightTypes::Light>> m_lights;
 	std::map<std::wstring, Renderer3D::Material> m_materials;
 	std::shared_ptr<Renderer3D::IRenderer> m_renderer;

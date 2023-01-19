@@ -4,7 +4,7 @@ using namespace Renderer3D;
 
 //TODO: revisit constructors, expand drawItem constructor to take material and texture
 TexturedBox::TexturedBox(std::shared_ptr<IRenderer> renderer, float x, float y, float z, float width, float height, float depth, 
-	const Renderer3D::Texture& tex, const Renderer3D::Material& mat) :
+	const Renderer3D::Texture& tex, const Renderer3D::Material& mat, Renderer3D::ShaderType shaderType) :
 	DrawItem(renderer),
 	m_height(height),
 	m_width(width),
@@ -16,7 +16,7 @@ TexturedBox::TexturedBox(std::shared_ptr<IRenderer> renderer, float x, float y, 
 	m_properties.texture = tex;
 	m_properties.material = mat;
 
-	m_properties.shaderType = ShaderType::TEXTURED;
+	m_properties.shaderType = shaderType;
 
 	m_properties.xAngle = 0;
 }
@@ -35,7 +35,7 @@ bool TexturedBox::loadGeometry()
 	std::vector<TexturedVertex> vertices(24);
 
 	//FRONT
-	vertices[0] =  TexturedVertex(m_properties.position.x -w, m_properties.position.z +h, m_properties.position.z -d, 0, 0);
+	/*vertices[0] =  TexturedVertex(m_properties.position.x -w, m_properties.position.z +h, m_properties.position.z -d, 0, 0);
 	vertices[1]  = TexturedVertex(m_properties.position.x +w, m_properties.position.z +h, m_properties.position.z -d, 1, 0);
 	vertices[2]  = TexturedVertex(m_properties.position.x -w, m_properties.position.z -h, m_properties.position.z -d, 0, 1);
 	vertices[3]  = TexturedVertex(m_properties.position.x +w, m_properties.position.z -h, m_properties.position.z -d, 1, 1);
@@ -68,7 +68,42 @@ bool TexturedBox::loadGeometry()
 	vertices[20] = TexturedVertex(m_properties.position.x -w, m_properties.position.z -h, m_properties.position.z +d, 0, 0);
 	vertices[21] = TexturedVertex(m_properties.position.x +w, m_properties.position.z -h, m_properties.position.z +d, 1, 0);
 	vertices[22] = TexturedVertex(m_properties.position.x -w, m_properties.position.z -h, m_properties.position.z -d, 0, 1);
-	vertices[23] = TexturedVertex(m_properties.position.x +w, m_properties.position.z -h, m_properties.position.z -d, 1, 1);
+	vertices[23] = TexturedVertex(m_properties.position.x +w, m_properties.position.z -h, m_properties.position.z -d, 1, 1);*/
+	vertices[0] = TexturedVertex( - w,  + h,  - d, 0, 0);
+	vertices[1] = TexturedVertex( + w,  + h,  - d, 1, 0);
+	vertices[2] = TexturedVertex( - w,  - h,  - d, 0, 1);
+	vertices[3] = TexturedVertex( + w,  - h,  - d, 1, 1);
+
+	//RIGHT
+	vertices[4] = TexturedVertex( + w,  + h,  - d, 0, 0);
+	vertices[5] = TexturedVertex( + w,  + h,  + d, 1, 0);
+	vertices[6] = TexturedVertex( + w,  - h,  - d, 0, 1);
+	vertices[7] = TexturedVertex( + w,  - h,  + d, 1, 1);
+
+	//LEFT
+	vertices[8] = TexturedVertex( - w,  + h,  + d, 0, 0);
+	vertices[9] = TexturedVertex( - w,  + h,  - d, 1, 0);
+	vertices[10] = TexturedVertex( - w,  - h,  + d, 0, 1);
+	vertices[11] = TexturedVertex( - w,  - h,  - d, 1, 1);
+
+	//BACK
+	vertices[12] = TexturedVertex( + w,  + h,  + d, 0, 0);
+	vertices[13] = TexturedVertex( - w,  + h,  + d, 1, 0);
+	vertices[14] = TexturedVertex( + w,  - h,  + d, 0, 1);
+	vertices[15] = TexturedVertex( - w,  - h,  + d, 1, 1);
+
+	//TOP
+	vertices[16] = TexturedVertex( - w,  + h,  + d, 0, 0);
+	vertices[17] = TexturedVertex( + w,  + h,  + d, 1, 0);
+	vertices[18] = TexturedVertex( - w,  + h,  - d, 0, 1);
+	vertices[19] = TexturedVertex( + w,  + h,  - d, 1, 1);
+
+	//BOTTOM
+	vertices[20] = TexturedVertex( - w,  - h,  + d, 0, 0);
+	vertices[21] = TexturedVertex( + w,  - h,  + d, 1, 0);
+	vertices[22] = TexturedVertex( - w,  - h,  - d, 0, 1);
+	vertices[23] = TexturedVertex( + w,  - h,  - d, 1, 1);
+
 
 	m_geometry.texVertices = vertices;//.data();
 	m_geometry.VertexBufferSize = static_cast<UINT>(vertices.size()) * sizeof(TexturedVertex);

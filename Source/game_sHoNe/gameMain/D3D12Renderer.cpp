@@ -123,6 +123,8 @@ namespace Renderer3D {
 
 	bool D3D12Renderer::Draw(DrawItem & drawItem)
 	{
+		//TODO: here somewhere call OMSetStencilRef to 1 for mirrors 0 otherwise
+
 		/*XMMATRIX transformMatrix = XMLoadFloat4x4(&drawItem.m_properties.objectConstants.WorldMatrix);
 		XMMATRIX proj = XMLoadFloat4x4(&m_projectionMatrix);
 
@@ -151,6 +153,12 @@ namespace Renderer3D {
 
 		m_d3dCommandList->SetGraphicsRootSignature(m_RootSignature.Get());
 
+		//set stencil reference value
+		if (ShaderType::Mirror == drawItem.m_properties.shaderType || ShaderType::Reflection == drawItem.m_properties.shaderType)
+			m_d3dCommandList->OMSetStencilRef(1);
+		else
+			m_d3dCommandList->OMSetStencilRef(0);
+
 		m_d3dCommandList->SetPipelineState(m_shaders[drawItem.m_properties.shaderType].pipelineStateObject.Get());
 
 		m_d3dCommandList->IASetVertexBuffers(0, 1, &drawItem.m_geometry.VertexBufferView());
@@ -174,7 +182,7 @@ namespace Renderer3D {
 		D3D12_GPU_VIRTUAL_ADDRESS matCBAddress = m_MaterialsConstantBuffer->Resource()->GetGPUVirtualAddress() + drawItem.m_properties.material.index*m_MaterialsConstantBuffer->getElementSize();
 		m_d3dCommandList->SetGraphicsRootConstantBufferView(5, matCBAddress);
 
-		if (drawItem.m_properties.shaderType == ShaderType::TEXTURED) {
+		if (drawItem.m_properties.shaderType != ShaderType::Plain) {
 			CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 			tex.Offset(drawItem.m_properties.texture.index, m_CrvSrvUrvDescriptorSize);
 			m_d3dCommandList->SetGraphicsRootDescriptorTable(1, tex);
@@ -189,7 +197,7 @@ namespace Renderer3D {
 	{
 		for (auto& drawItem : staticDrawItems)
 		{
-			if (drawItem->m_properties.shaderType == ShaderType::TEXTURED)
+			if (drawItem->m_properties.shaderType != ShaderType::Plain)
 				drawItem->m_geometry.VertexBufferGPU = CreateDefaultBuffer(m_d3dDevice.Get(), m_d3dCommandList.Get(), drawItem->m_geometry.texVertices.data(),
 					drawItem->m_geometry.VertexBufferSize, drawItem->m_geometry.VertexBufferUploader);
 			else
@@ -310,7 +318,7 @@ namespace Renderer3D {
 		m_lightConstants.numberOfLights = 0;
 	}
 
-	void D3D12Renderer::createPSO(shadersAndPSO& shader)
+	void D3D12Renderer::createPSO(shadersAndPSO& shader, ShaderType shaderType)
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 		ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
@@ -328,8 +336,94 @@ namespace Renderer3D {
 		};
 		psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 		//psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+
 		psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+		if (ShaderType::Transparent == shaderType)
+		{
+			D3D12_RENDER_TARGET_BLEND_DESC blendDesc;
+			blendDesc.BlendEnable = true;
+			blendDesc.LogicOpEnable = false;
+
+			blendDesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+			blendDesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+			blendDesc.BlendOp = D3D12_BLEND_OP_ADD;
+
+			blendDesc.SrcBlendAlpha = D3D12_BLEND_ONE;
+			blendDesc.DestBlendAlpha = D3D12_BLEND_ZERO;
+			blendDesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+
+			blendDesc.LogicOp = D3D12_LOGIC_OP_NOOP;
+			blendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+			psoDesc.BlendState.RenderTarget[0] = blendDesc;
+		}
+		else if (ShaderType::Mirror == shaderType)
+		{
+			//disable writing to back buffer we only need to mark area in stencil buffer
+			psoDesc.BlendState.RenderTarget[0].RenderTargetWriteMask = 0;
+		}
+
+		if (ShaderType::AlphaTest == shaderType)
+		{
+			psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+		}
+
 		psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+		if (ShaderType::Mirror == shaderType)
+		{
+			D3D12_DEPTH_STENCIL_DESC mirrorDSS;
+
+			//DEPTH properties
+			mirrorDSS.DepthEnable = true;
+			//disable writing to depth buffer
+			mirrorDSS.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+			mirrorDSS.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+
+			//STENCIL properties
+			mirrorDSS.StencilEnable = true;
+			mirrorDSS.StencilReadMask = 0xff; //for some special techniques some bits can be masked
+			mirrorDSS.StencilWriteMask = 0xff;
+
+			mirrorDSS.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+			mirrorDSS.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+			mirrorDSS.FrontFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
+			mirrorDSS.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+
+			mirrorDSS.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+			mirrorDSS.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+			mirrorDSS.BackFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
+			mirrorDSS.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+			
+			psoDesc.DepthStencilState = mirrorDSS;
+		}
+		else if (ShaderType::Reflection == shaderType)
+		{
+			D3D12_DEPTH_STENCIL_DESC reflectionDSS;
+
+			//DEPTH properties
+			reflectionDSS.DepthEnable = true;
+			//disable writing to depth buffer
+			reflectionDSS.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+			reflectionDSS.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+
+			//STENCIL properties
+			reflectionDSS.StencilEnable = true;
+			reflectionDSS.StencilReadMask = 0xff; //for some special techniques some bits can be masked
+			reflectionDSS.StencilWriteMask = 0xff;
+
+			reflectionDSS.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+			reflectionDSS.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+			reflectionDSS.FrontFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
+			reflectionDSS.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_EQUAL;
+
+			reflectionDSS.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+			reflectionDSS.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+			reflectionDSS.BackFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
+			reflectionDSS.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_EQUAL;
+
+			psoDesc.DepthStencilState = reflectionDSS;
+		}
+
 		psoDesc.SampleMask = UINT_MAX;
 		psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		psoDesc.NumRenderTargets = 1;
@@ -690,8 +784,9 @@ namespace Renderer3D {
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 		};
-		createPSO(normalShader);
-		m_shaders[ShaderType::PLAIN] = normalShader;
+		createPSO(normalShader, ShaderType::Plain);
+		m_shaders[ShaderType::Plain] = normalShader;
+
 
 		shadersAndPSO texturedShader;
 		texturedShader.vertexShaderByteCode = CompileShader(L"Shaders\\TexturedShader.hlsl", nullptr, "VS", "vs_5_0");
@@ -702,8 +797,34 @@ namespace Renderer3D {
 			{ "TEX", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 			{ "NORMAL", 0,  DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 		};
-		createPSO(texturedShader);
-		m_shaders[ShaderType::TEXTURED] = texturedShader;
+		createPSO(texturedShader, ShaderType::Textured);
+		m_shaders[ShaderType::Textured] = texturedShader;
+
+
+		shadersAndPSO transparentShader = texturedShader;
+		createPSO(transparentShader, ShaderType::Transparent);
+		m_shaders[ShaderType::Transparent] = transparentShader;
+
+
+		shadersAndPSO alphaTestShader = texturedShader;
+		const D3D_SHADER_MACRO alphaTestDefines[] =
+		{
+			"ALPHA_TEST", "1",
+			NULL, NULL
+		};
+		alphaTestShader.pixelShaderByteCode = CompileShader(L"Shaders\\TexturedShader.hlsl", alphaTestDefines, "PS", "ps_5_0");
+		createPSO(alphaTestShader, ShaderType::AlphaTest);
+		m_shaders[ShaderType::AlphaTest] = alphaTestShader;
+
+
+		shadersAndPSO mirrorShader = texturedShader;
+		createPSO(mirrorShader, ShaderType::Mirror);
+		m_shaders[ShaderType::Mirror] = mirrorShader;
+
+		shadersAndPSO reflectedShader = texturedShader;
+		createPSO(reflectedShader, ShaderType::Reflection);
+		m_shaders[ShaderType::Reflection] = reflectedShader;
+
 	}
 
 	LRESULT  D3D12Renderer::windowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {

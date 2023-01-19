@@ -6,7 +6,7 @@ class PlaneDrawItem :
 	public Renderer3D::DrawItem
 {
 public:
-	PlaneDrawItem(std::shared_ptr<Renderer3D::IRenderer> renderer, MathHelper::PositionVector position, float angle);
+	PlaneDrawItem(std::shared_ptr<Renderer3D::IRenderer> renderer, MathHelper::Position3 position, float angle);
 	~PlaneDrawItem();
 
 private:
