@@ -40,7 +40,7 @@ namespace Renderer3D{
 
 	struct LightConstants
 	{
-		DirectX::XMFLOAT4 AmbientLight = { 0.5f, 0.5f, 0.5f, 1.0f };
+		DirectX::XMFLOAT4 AmbientLight = { 0.2f, 0.2f, 0.2f, 1.0f };
 		Light Lights[MAX_LIGHTS];
 		int numberOfLights = 0;
 	};
@@ -107,7 +107,7 @@ namespace Renderer3D{
 		void OnResize();
 
 		void CreateShadersAndInputLayout();
-		void createPSO(shadersAndPSO& shader);
+		void createPSO(shadersAndPSO& shader, ShaderType shaderType);
 	private:
 		ComPtr<IDXGIFactory4> m_dxgiFactory;
 		ComPtr<ID3D12Device>  m_d3dDevice;

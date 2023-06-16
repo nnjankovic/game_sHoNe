@@ -69,3 +69,12 @@ ComPtr<ID3D12Resource> CreateDefaultBuffer(ID3D12Device * device, ID3D12Graphics
 
 	return defaultBuffer;
 }
+
+DirectX::XMFLOAT3 MathHelper::Normalize(const DirectX::XMFLOAT3 value)
+{
+	DirectX::XMVECTOR vector = DirectX::XMLoadFloat3(&value);
+	vector = DirectX::XMVector3Normalize(vector);
+	DirectX::XMFLOAT3 ret;
+	DirectX::XMStoreFloat3(&ret, vector);
+	return ret;
+}

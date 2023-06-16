@@ -8,7 +8,6 @@ BoxDrawItem::BoxDrawItem(std::shared_ptr<Renderer3D::IRenderer> renderer, float 
 	m_width(width),
 	m_depth(depth)
 {
-	//TODO: temporarly here remove hardcoded values from constructor
 	m_properties.position.x = x;
 	m_properties.position.y = y;
 	m_properties.position.z = z;

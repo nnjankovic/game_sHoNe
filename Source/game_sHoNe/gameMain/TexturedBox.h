@@ -4,9 +4,9 @@ class TexturedBox :
 	public Renderer3D::DrawItem
 {
 public:
-	TexturedBox(std::shared_ptr<Renderer3D::IRenderer> renderer, float x, float y, float z, float width, float height, float depth, 
+	TexturedBox(std::shared_ptr<Renderer3D::IRenderer> renderer, float x, float y, float z, float width, float height, float depth,
 		const Renderer3D::Texture& tex,
-		const Renderer3D::Material& mat);
+		const Renderer3D::Material& mat, Renderer3D::ShaderType shaderType = Renderer3D::ShaderType::Textured);
 	~TexturedBox();
 
 	// Inherited via DrawItem

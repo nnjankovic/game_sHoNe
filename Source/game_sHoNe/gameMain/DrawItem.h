@@ -2,10 +2,15 @@
 #ifndef DRAWITEM_H_
 #define DRAWITEM_H_
 
+
+
+
+
 #include "Utility.h"
 #include "D3D12Renderer.h"
 #include "GameTimer.h"
 #include "IRenderer.h"
+#include "IDrawItemComponent.h"
 
 #include <memory>
 
@@ -13,6 +18,7 @@ using namespace DirectX;
 using namespace DirectX::PackedVector;
 
 namespace Renderer3D {
+	class MoveOnInputDrawItemComponent;
 
 	struct BasicVertex
 	{
@@ -25,6 +31,15 @@ namespace Renderer3D {
 		TexturedVertex(float x, float y, float z, float tx, float ty) :
 			Pos(x, y, z),
 			TexC(tx, ty) {}
+		TexturedVertex(float x, float y, float z, float tx, float ty, float nx, float ny, float nz) :
+			Pos(x, y, z),
+			TexC(tx, ty),
+			Normal(nx, ny, nz) {}
+		TexturedVertex(MathHelper::Position3 pos, MathHelper::Position2 texPos, MathHelper::Position3 normalPos) :
+			Pos(pos.x, pos.y, pos.z),
+			TexC(texPos.x, texPos.y),
+			Normal(normalPos.x, normalPos.y, normalPos.z) {}
+
 
 		XMFLOAT3 Pos;
 		XMFLOAT2 TexC;
@@ -47,20 +62,27 @@ namespace Renderer3D {
 		MaterialConstants materialConstants;
 	};
 
-	struct DrawItemProperties {
-		//ComPtr<ID3DBlob> vertexShaderByteCode;
-		//ComPtr<ID3DBlob> pixelShaderByteCode;
-		//ComPtr<ID3D12PipelineState> pipelineStateObject;
-		//std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout;
+	enum class coordinateAxes {
+		X,
+		Y,
+		Z
+	};
 
+
+	struct DrawItemProperties {
 		ObjectConstants objectConstants;
-		MathHelper::PositionVector position;
+		MathHelper::Position3 position;
 		float xAngle = 0;
+		float yAngle = 0;
+		float zAngle = 0;
+		
+		float scaleFactor = 1;
 
 		Texture texture;
+		MathHelper::Position2 textureScaling;
 		Material material;
 
-		ShaderType shaderType = ShaderType::PLAIN;
+		ShaderType shaderType = ShaderType::Plain;
 
 		unsigned int constantBufferIndex = 0;
 		//bool isTextured = false;
@@ -106,21 +128,24 @@ namespace Renderer3D {
 
 	class DrawItem {
 		friend class D3D12Renderer;
+		friend class MoveOnInputDrawItemComponent;
 	public:
 		DrawItem(std::shared_ptr<IRenderer> renderer) : m_renderer(renderer) {}
-		virtual ~DrawItem() {};
+		virtual ~DrawItem();
 
-		virtual void create() {
-			//createShadersAndInputLayout();
-			m_properties.constantBufferIndex = s_constantBuffer++;
-			loadGeometry();
-			computeNormals();
-			//m_renderer->createPSO(*this);
+		virtual void create();
+
+		void addComponent(std::shared_ptr<IDrawItemComponent> component) {
+			m_components.push_back(component);
 		}
 
 		virtual void Draw(XMMATRIX matrixStack);
 
 		virtual void Update(const GameTimer& gt) {}
+
+		void changeShaderType(Renderer3D::ShaderType shaderType) {
+			m_properties.shaderType = shaderType;
+		}
 
 	protected:
 		//virtual bool createShadersAndInputLayout() = 0;
@@ -136,6 +161,8 @@ namespace Renderer3D {
 		std::shared_ptr<IRenderer> m_renderer;
 
 		static unsigned int s_constantBuffer;
+
+		std::vector<std::shared_ptr<IDrawItemComponent>> m_components;
 	};
 
 };

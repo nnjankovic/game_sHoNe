@@ -15,8 +15,12 @@ namespace Renderer3D{
 	struct Material;
 
 	enum class ShaderType {
-		PLAIN,
-		TEXTURED
+		Plain,
+		Textured,
+		Transparent,
+		AlphaTest,
+		Mirror,
+		Reflection
 	};
 
 	struct IRenderer {

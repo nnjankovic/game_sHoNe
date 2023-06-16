@@ -25,6 +25,12 @@
     <Filter Include="Source Files\DrawItems">
       <UniqueIdentifier>{97aef9c5-9b04-4485-85c6-0460a685a24c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\GameView\DrawItemComponents">
+      <UniqueIdentifier>{b19853d0-88c6-49d2-ae09-5e093cf54659}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DrawItemComponents">
+      <UniqueIdentifier>{e4161f70-492b-47b0-bbad-ea896f371632}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -67,6 +73,12 @@
       <Filter>Source Files\DrawItems</Filter>
     </ClCompile>
     <ClCompile Include="Lights.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadedDrawItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveOnInputDrawItemComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -119,5 +131,17 @@
     <ClInclude Include="Lights.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LoadedDrawItem.h">
+      <Filter>Header Files\GameView\DrawItems</Filter>
+    </ClInclude>
+    <ClInclude Include="IDrawItemComponent.h">
+      <Filter>Header Files\GameView\DrawItemComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveOnInputDrawItemComponent.h">
+      <Filter>Header Files\GameView\DrawItemComponents</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scene.fbx" />
   </ItemGroup>
 </Project>
