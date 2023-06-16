@@ -6,6 +6,8 @@
 #include "LoadedDrawItem.h"
 #include "MoveOnInputDrawItemComponent.h"
 
+#include <filesystem>
+
 Scene::Scene(HINSTANCE hInstance, std::shared_ptr<UserControllerListener> userControlListener, std::shared_ptr<GameTimer> timer) : 
 	m_hInstance(hInstance),
 	m_userControlListener(userControlListener),
@@ -22,10 +24,10 @@ void Scene::Init()
 	UploadTextures();
 	BuildMaterials();
 
-	/*auto texBox1 = std::make_shared<TexturedBox>(m_renderer, -5, -15, 25, 2, 2, 2, m_textures[L"woodCrate"], m_materials[L"woodCrate"]);
+	auto texBox1 = std::make_shared<TexturedBox>(m_renderer, -5, -15, 25, 2, 2, 2, m_textures[L"woodCrate"], m_materials[L"woodCrate"]);
 	texBox1->create();
-	m_Items.push_back(texBox1);*/
-
+	m_Items.push_back(texBox1);
+	/*
 	auto texBox2 = std::make_shared<TexturedBox>(m_renderer, 0, 2.5, 14.5, 5, 5, 5, m_textures[L"woodCrate"], m_materials[L"woodCrate"]);
 	auto moveComponent = std::make_shared<Renderer3D::MoveOnInputDrawItemComponent>(texBox2, [](Renderer3D::DrawItemProperties& properties, std::wstring button) {
 		float inc = 0.7;
@@ -85,7 +87,7 @@ void Scene::Init()
 	/*auto plane = std::make_shared<PlaneDrawItem>(m_renderer, MathHelper::PositionVector{0,0,0}, 0);
 	plane->create();
 	m_Items.push_back(plane);*/
-
+	/*
 	auto texturedPlane = std::make_shared<TexturedPlane>(m_renderer, MathHelper::Position3{ 0,0,0 }, 
 														 50, 50, 0, 1, 
 														 m_textures[L"checkboard"], MathHelper::Position2{6,6},
@@ -111,7 +113,7 @@ void Scene::Init()
 	auto texturedWallFront = std::make_shared<TexturedPlane>(m_renderer, wallPosition, wallM, wallN, -1.5708, m_textures[L"tile"], m_materials[L"stone"]);
 	texturedWallFront->create();
 	m_Items.push_back(texturedWallFront);*/
-
+	/*
 	auto mirror = std::make_shared<TexturedPlane>(m_renderer, MathHelper::Position3{ -18,13,24.4 },
 		2, 2, -1.5708, 12,
 		m_textures[L"ice"], MathHelper::Position2{ 1,1 },
@@ -120,9 +122,9 @@ void Scene::Init()
 	mirror->create();
 	m_Mirrors.push_back(mirror);
 
-	auto loadPlane = std::make_shared<LoadedDrawItem>(m_renderer, L"Models\\plane1.obj", MathHelper::Position3{ 0, 7.5, 24.5}, -1.5708, 1, m_textures[L"tile"], m_materials[L"brick"]);
-	loadPlane->create();
-	m_Transparent.push_back(loadPlane);
+	//auto loadPlane = std::make_shared<LoadedDrawItem>(m_renderer, L"Models\\plane1.obj", MathHelper::Position3{ 0, 7.5, 24.5}, -1.5708, 1, m_textures[L"tile"], m_materials[L"brick"]);
+	//loadPlane->create();
+	//m_Transparent.push_back(loadPlane);
 
 	auto wireBox1 = std::make_shared<TexturedBox>(m_renderer, -5, 2.5, -5, 5, 5, 5, m_textures[L"wire"], m_materials[L"wire"], Renderer3D::ShaderType::AlphaTest);
 	wireBox1->create();
@@ -133,9 +135,9 @@ void Scene::Init()
 	m_Items.push_back(transparentBox1);*/
 
 	
-	auto loadSphere = std::make_shared<LoadedDrawItem>(m_renderer, L"Models\\sphere.obj", MathHelper::Position3{ 0, 3, -10}, 0, 3, m_textures[L"ice"], m_materials[L"ice"], Renderer3D::ShaderType::Transparent);
-	loadSphere->create();
-	m_Transparent.push_back(loadSphere);
+	//auto loadSphere = std::make_shared<LoadedDrawItem>(m_renderer, L"Models\\sphere.obj", MathHelper::Position3{ 0, 3, -10}, 0, 3, m_textures[L"ice"], m_materials[L"ice"], Renderer3D::ShaderType::Transparent);
+	//loadSphere->create();
+	//m_Transparent.push_back(loadSphere);
 
 	BuildLights();
 
@@ -177,45 +179,54 @@ Scene::~Scene()
 
 void Scene::UploadTextures()
 {
+	std::filesystem::path texturesPath;
+	if (std::filesystem::exists(L"..\\..\\Assets\\Textures"))
+		texturesPath = L"..\\..\\Assets\\Textures";
+	else if(std::filesystem::exists(L"..\\..\\..\\Assets\\Textures"))
+		texturesPath = L"..\\..\\..\\Assets\\Textures";
+
+	if (texturesPath.empty())
+		return;
+
 	Renderer3D::Texture woodCrateTexture;
 	woodCrateTexture.name = L"woodCrate";
-	woodCrateTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WoodCrate01.dds";
-	//woodCrateTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WoodCrate01.dds";
+	woodCrateTexture.fileName = texturesPath.append("WoodCrate01.dds");
+	woodCrateTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WoodCrate01.dds";
 	m_renderer->UploadTexture(woodCrateTexture);
 	m_textures[woodCrateTexture.name] = woodCrateTexture;
+	texturesPath = texturesPath.parent_path();
 
 	Renderer3D::Texture checkboardTexture;
 	checkboardTexture.name = L"checkboard";
-	checkboardTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\checkboard.dds";
-	//checkboardTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\checkboard.dds";
+	checkboardTexture.fileName = texturesPath.append("checkboard.dds");
 	m_renderer->UploadTexture(checkboardTexture);
 	m_textures[checkboardTexture.name] = checkboardTexture;
+	texturesPath = texturesPath.parent_path();
 
 	Renderer3D::Texture tileTexture;
 	tileTexture.name = L"tile";
-	tileTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\tile.dds";
-	//tileTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\tile.dds";
+	tileTexture.fileName = texturesPath.append("tile.dds");
 	m_renderer->UploadTexture(tileTexture);
 	m_textures[tileTexture.name] = tileTexture;
+	texturesPath = texturesPath.parent_path();
 
 	Renderer3D::Texture iceTexture;
 	iceTexture.name = L"ice";
-	iceTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\ice.dds";
-	//tileTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\ice.dds";
+	iceTexture.fileName = texturesPath.append("ice.dds");
 	m_renderer->UploadTexture(iceTexture);
 	m_textures[iceTexture.name] = iceTexture;
+	texturesPath = texturesPath.parent_path();
 
 	Renderer3D::Texture wireTexture;
 	wireTexture.name = L"wire";
-	wireTexture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WireFence.dds";
-	//tileTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WireFence.dds";
+	wireTexture.fileName = texturesPath.append("WireFence.dds");
 	m_renderer->UploadTexture(wireTexture);
 	m_textures[wireTexture.name] = wireTexture;
+	texturesPath = texturesPath.parent_path();
 
 	Renderer3D::Texture brick3Texture;
 	brick3Texture.name = L"brick3";
-	brick3Texture.fileName = L"C:\\Users\\nenad.n.jankovic\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\bricks3.dds";
-	//tileTexture.fileName = L"C:\\Users\\shone\\Documents\\GitHub\\game_sHoNe\\Assets\\Textures\\WireFence.dds";
+	brick3Texture.fileName = texturesPath.append("bricks3.dds");
 	m_renderer->UploadTexture(brick3Texture);
 	m_textures[brick3Texture.name] = brick3Texture;
 }
